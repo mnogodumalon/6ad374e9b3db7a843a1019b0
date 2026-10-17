@@ -20,6 +20,7 @@
 import type { ComponentType } from 'react';
 
 // <custom:intent-imports>
+import { IconInbox, IconListCheck, IconAlertTriangle, IconMessageQuestion, IconMessageReply, IconCircleCheck } from '@tabler/icons-react';
 // </custom:intent-imports>
 
 export interface IntentLink {
@@ -42,6 +43,12 @@ export interface IntentLink {
 
 export const INTENTS: IntentLink[] = [
   // <custom:intents>
+  { path: '/intents/anfrage-aufnehmen', label: { de: 'Anfrage aufnehmen', en: 'Record inquiry' }, icon: IconInbox, description: 'Kunde wählen, Anfrage erfassen, erste Quelle ablegen, Verantwortlichen und Priorität festlegen.' },
+  { path: '/intents/anforderungen-erfassen', label: { de: 'Anforderungen erfassen', en: 'Capture requirements' }, icon: IconListCheck, description: 'Technische Anforderungen zu einer Anfrage anlegen, Quellen zuordnen, Anfrage in Prüfung setzen.' },
+  { path: '/intents/offenen-punkt-anlegen', label: { de: 'Offenen Punkt mit Aufgabe anlegen', en: 'Create open item with task' }, icon: IconAlertTriangle, description: 'Klärungsbedarf als offenen Punkt erfassen und direkt eine verantwortete Aufgabe anlegen.' },
+  { path: '/intents/rueckfrage-vorbereiten', label: { de: 'Rückfrage vorbereiten', en: 'Prepare inquiry message' }, icon: IconMessageQuestion, description: 'Aus offenen Punkten einen Nachrichtenentwurf bündeln (nicht versendet); Punkte warten danach auf den Kunden.' },
+  { path: '/intents/antwort-zuordnen', label: { de: 'Antwort zuordnen', en: 'Assign reply' }, icon: IconMessageReply, description: 'Antwort erfassen, mit Nachricht und offenen Punkten verknüpfen und als vollständig, unklar oder widersprüchlich kennzeichnen.' },
+  { path: '/intents/klaerung-abschliessen', label: { de: 'Technische Klärung abschließen', en: 'Complete technical clarification' }, icon: IconCircleCheck, description: 'Voraussetzungen prüfen, Abschluss mit Restrisiken und Übergabe dokumentieren, Anfrage auf technisch geklärt setzen. Keine automatische Freigabe.' },
   // </custom:intents>
 ];
 
@@ -52,7 +59,7 @@ export const INTENTS: IntentLink[] = [
  * purpose — a scaffold update resets it to false (self-healing if Phase 2
  * never ran).
  */
-export const INTENTS_PENDING = true;
+export const INTENTS_PENDING = false;
 
 /**
  * When the Phase-1 bundle was deployed (ISO, set by the service together with

@@ -53,6 +53,19 @@ export type MessageFieldKey<E extends EntityKey> = E extends keyof MessageFields
 
 export const REQUIRED_MESSAGES: { [E in EntityKey]?: Partial<Record<MessageFieldKey<E>, string>> } = {
   // <custom:messages>
+  kunden: { firmenname: "Bitte den Firmennamen eingeben." },
+  kundenanfragen: { kunde: "Bitte einen Kunden auswählen.", eingangsdatum: "Bitte das Eingangsdatum wählen.", anfragebeschreibung: "Bitte die Anfrage kurz beschreiben.", urspruengliche_kundenanforderungen: "Bitte die Kundenanforderungen unverändert eintragen.", status: "Bitte einen Status wählen." },
+  technischer_abschluss: { anfrage: "Bitte eine Anfrage auswählen.", pruefdatum: "Bitte das Prüfdatum wählen.", geprueft_von: "Bitte eintragen, wer geprüft hat." },
+  statusprotokoll: { anfrage: "Bitte eine Anfrage auswählen.", objekttyp: "Bitte den Objekttyp wählen.", objektbezeichnung: "Bitte das Objekt benennen.", neuer_status: "Bitte den neuen Status eintragen.", zeitpunkt: "Bitte den Zeitpunkt wählen.", benutzer_vorname: "Bitte den Vornamen eingeben.", benutzer_nachname: "Bitte den Nachnamen eingeben." },
+  informationsquellen: { anfrage: "Bitte eine Anfrage auswählen.", quellentyp: "Bitte den Quellentyp wählen.", titel: "Bitte einen Titel eingeben." },
+  technische_anforderungen: { anfrage: "Bitte eine Anfrage auswählen.", bezeichnung: "Bitte die Anforderung benennen.", beschreibung: "Bitte die Anforderung beschreiben.", pruefstatus: "Bitte den Prüfstatus wählen." },
+  offene_punkte: { anfrage: "Bitte eine Anfrage auswählen.", kurztitel: "Bitte einen Kurztitel eingeben.", beschreibung: "Bitte Beschreibung und Grund eintragen.", prioritaet: "Bitte eine Priorität wählen.", status: "Bitte einen Status wählen." },
+  aufgaben: { anfrage: "Bitte eine Anfrage auswählen.", titel: "Bitte einen Titel eingeben.", verantwortlicher_vorname: "Bitte den Vornamen des Verantwortlichen eingeben.", verantwortlicher_nachname: "Bitte den Nachnamen des Verantwortlichen eingeben.", status: "Bitte einen Status wählen." },
+  beurteilungen: { anfrage: "Bitte eine Anfrage auswählen.", beurteilungsgegenstand: "Bitte den Beurteilungsgegenstand eingeben.", fachliche_begruendung: "Bitte die fachliche Begründung eintragen." },
+  rueckfragen_und_kommunikation: { anfrage: "Bitte eine Anfrage auswählen.", kommunikationstyp: "Bitte den Kommunikationstyp wählen.", betreff: "Bitte einen Betreff eingeben.", inhalt: "Bitte den Inhalt eintragen.", versandstatus: "Bitte den Versandstatus wählen." },
+  entscheidungen: { anfrage: "Bitte eine Anfrage auswählen.", titel: "Bitte einen Titel eingeben.", entscheidungsgegenstand: "Bitte den Entscheidungsgegenstand beschreiben.", entscheidung: "Bitte die Entscheidung eintragen.", begruendung: "Bitte die Begründung eintragen.", verantwortlicher_vorname: "Bitte den Vornamen des Entscheiders eingeben.", verantwortlicher_nachname: "Bitte den Nachnamen des Entscheiders eingeben.", entscheidungsstatus: "Bitte den Entscheidungsstatus wählen." },
+  erfahrungen: { ursprungsanfrage: "Bitte die ursprüngliche Anfrage auswählen.", titel: "Bitte einen Titel eingeben.", sachverhalt: "Bitte den Sachverhalt beschreiben.", bestaetigungsstatus: "Bitte den Bestätigungsstatus wählen." },
+  wiederverwendung_von_erfahrungen: { erfahrung: "Bitte eine Erfahrung auswählen.", ziel_anfrage: "Bitte die spätere Anfrage auswählen." },
   // </custom:messages>
 };
 
