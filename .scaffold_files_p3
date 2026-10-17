@@ -1,0 +1,833 @@
+# Scaffold key file contents — part 3/4.
+Same rule as .scaffold_context: these files are pre-generated; never Read the source files themselves.
+
+## src/App.tsx
+```
+import '@/lib/sentry';
+import '@/lib/stale-bundle';
+import { Fragment, lazy, Suspense, useEffect, useState } from 'react';
+import { HashRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { locale, onLocaleChange, syncProfileLocale, t } from '@/i18n';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { ErrorBusProvider } from '@/components/ErrorBus';
+import { Layout } from '@/components/Layout';
+import DashboardReady from '@/pages/DashboardReady';
+import PublicPagesAdmin from '@/pages/PublicPagesAdmin';
+import PublicPageFields from '@/pages/PublicPageFields';
+import IntentFields from '@/pages/IntentFields';
+import { IntentPolicyLoader } from '@/components/IntentPolicyLoader';
+import IntentsAdmin from '@/pages/IntentsAdmin';
+import AppMap from '@/pages/AppMap';
+// <custom:imports>
+// </custom:imports>
+
+// Lazy: public pages live outside <Layout> and only load on /#/public/:slug —
+// dashboard users never pay for them, anonymous visitors skip the dashboard.
+const PublicPage = lazy(() => import('@/pages/public/PublicPage'));
+
+function RouteNotFound() {
+  const { pathname } = useLocation();
+  return (
+    <div className="max-w-xl mx-auto mt-16 rounded-[27px] bg-card shadow-lg p-8 space-y-3" role="alert">
+      <h1 className="text-xl font-semibold tracking-tight">{t('nf_title')}</h1>
+      <p className="text-sm text-muted-foreground break-all">{t('nf_message', { path: pathname })}</p>
+      <a href="#/" className="inline-flex text-sm font-medium text-primary hover:underline">{t('nf_back')}</a>
+    </div>
+  );
+}
+
+// Language switch = full remount below the router: every t()/label lookup
+// re-evaluates, the la-* widgets re-read <html lang>. Sits inside HashRouter
+// so the current route survives (it re-reads the URL hash).
+function LocaleGate({ children }: { children: React.ReactNode }) {
+  // The i18n layer notifies for locale CHANGES and for catalog/overlay
+  // ARRIVALS (same locale, new data). `setCurrent(locale)` bailed out on
+  // the arrivals — when locales/pages.json lost the race against the first
+  // paint, the page stayed frozen in the build language until the next
+  // locale switch. A generation counter accepts every notification; the
+  // key must include it because `children` is the same element object on
+  // every gate render (React would bail out without the remount).
+  const [gen, setGen] = useState(0);
+  useEffect(() => onLocaleChange(() => setGen((g) => g + 1)), []);
+  // Adopt the LA profile language (SSOT) — but never on public routes,
+  // where the visitor's browser language governs (initPublicLocale).
+  useEffect(() => {
+    if (!window.location.hash.startsWith('#/public')) void syncProfileLocale();
+  }, []);
+  return <Fragment key={`${locale}:${gen}`}>{children}</Fragment>;
+}
+
+const APPGROUP_ID = '6ad374e9b3db7a843a1019b0';
+
+// The assistant (chat + Werkzeuge + code viewer) is platform chrome:
+// <la-klar-assistant>, loaded via /actions-agent/embed/embed.js (appended
+// dynamically in index.html). Own shadow DOM, own styling. Mounted OUTSIDE
+// LocaleGate on purpose — its keyed remounts (locale switch, catalog
+// arrival) must not tear the element down mid-chat; the element follows
+// <html lang> itself. Hidden on anonymous public routes; its 401 guard is
+// the backstop, not the mechanism.
+function AssistantMount() {
+  const location = useLocation();
+  if (location.pathname.startsWith('/public')) return null;
+  return <la-klar-assistant appgroup-id={APPGROUP_ID} />;
+}
+
+export default function App() {
+  return (
+    <ErrorBoundary>
+      <ErrorBusProvider>
+        <HashRouter>
+            <AssistantMount />
+            <IntentPolicyLoader />
+            <LocaleGate>
+            <Routes>
+              <Route path="public/:slug" element={<Suspense fallback={null}><PublicPage /></Suspense>} />
+              <Route element={<Layout />}>
+                <Route index element={<DashboardReady />} />
+                <Route path="verwaltung/ablaeufe" element={<IntentsAdmin />} />
+                <Route path="verwaltung/anwendung" element={<AppMap />} />
+                <Route path="verwaltung/ablaeufe/:slug/felder" element={<IntentFields />} />
+                <Route path="verwaltung/oeffentliche-seiten" element={<PublicPagesAdmin />} />
+                <Route path="verwaltung/oeffentliche-seiten/:slug/felder" element={<PublicPageFields />} />
+                {/* <custom:routes> */}
+                {/* </custom:routes> */}
+                {/* An unknown hash (a bookmark from before a rebuild renamed the
+                    flows, a mistyped link) must not be a blank page. */}
+                <Route path="*" element={<RouteNotFound />} />
+              </Route>
+            </Routes>
+            </LocaleGate>
+        </HashRouter>
+      </ErrorBusProvider>
+    </ErrorBoundary>
+  );
+}
+
+```
+
+## src/components/Layout.tsx
+```
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { IconAlertCircle } from '@tabler/icons-react';
+import { useState, useEffect, useRef } from 'react';
+import { IntentsNav } from '@/components/IntentsNav';
+import { ActionsSidebar } from '@/components/ActionsSidebar';
+import { Button } from '@/components/ui/button';
+import { VersionCheck } from '@/components/VersionCheck';
+import { PlanNotice } from '@/components/PlanNotice';
+// Sprachwechsel kommt aus der Plattform-Topnav: sie schreibt <html lang>,
+// src/i18n beobachtet das Attribut und LocaleGate remountet den Baum.
+import { t, appgroupLabel } from '@/i18n';
+
+const APP_ID = '6ad374a7cdbb4a3fe2285276';
+const APPGROUP_ID = '6ad374e9b3db7a843a1019b0';
+
+const IS_EMBED = new URLSearchParams(window.location.search).has('embed') || window.navigator.userAgent.startsWith('LivingAppsMobile');
+
+export function Layout() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [authError, setAuthError] = useState(false);
+  const drawerRef = useRef<HTMLElement>(null);
+  const dashboardLinkRef = useRef<HTMLElement>(null);
+  useEffect(() => { document.title = appgroupLabel(); }, []);
+  useEffect(() => {
+    const handler = () => setAuthError(true);
+    window.addEventListener('auth-error', handler);
+    return () => window.removeEventListener('auth-error', handler);
+  }, []);
+
+  // Mobil startet der Drawer eingeklappt. Das collapsed-Attribut wird
+  // imperativ gesetzt (nicht als JSX-Prop), weil die Header-Bar es beim
+  // Toggle selbst setzt/entfernt — React darf es nicht zurückerobern.
+  useEffect(() => {
+    if (drawerRef.current && window.matchMedia('(max-width: 767.98px)').matches) {
+      drawerRef.current.setAttribute('collapsed', '');
+    }
+  }, []);
+
+  // Der Dashboard-Eintrag zeigt per App-Parameter auf genau diese Seite —
+  // statt sie neu zu laden (leave-page + location.assign), fangen wir das
+  // cancelbare Event ab und wechseln SPA-intern auf die Übersicht.
+  useEffect(() => {
+    const el = dashboardLinkRef.current;
+    if (!el) return;
+    const handler = (e: Event) => {
+      e.preventDefault();
+      navigate('/');
+      if (window.matchMedia('(max-width: 767.98px)').matches) {
+        el.closest('la-drawer')?.setAttribute('collapsed', '');
+      }
+    };
+    el.addEventListener('dashboard-link:action-request', handler);
+    return () => el.removeEventListener('dashboard-link:action-request', handler);
+  }, [navigate]);
+
+  // Aktiv-Zustand des Dashboard-Eintrags: la-dashboard-link-widget kennt
+  // (anders als la-app-group-nav-widget) kein here-Flag — Widget-Lücke.
+  // Wir spiegeln die here-Optik der Nachbarliste über ein zustandsabhängiges
+  // Stylesheet im offenen Shadow DOM. Interval-Fallback, weil der Loader
+  // asynchron lädt und das Shadow Root beim ersten Render fehlen kann.
+  const onDashboard = location.pathname === '/';
+  useEffect(() => {
+    const apply = () => {
+      const sr = dashboardLinkRef.current?.shadowRoot;
+      if (!sr) return false;
+      let style = sr.querySelector('style[data-here]');
+      if (!style) {
+        style = document.createElement('style');
+        style.setAttribute('data-here', '');
+        sr.appendChild(style);
+      }
+      // #d24601 = text-action-orange-dark der Widget-Library (here-Optik)
+      style.textContent = onDashboard
+        ? 'a { color: #d24601 !important; font-weight: 500; cursor: default; }'
+        : '';
+      return true;
+    };
+    if (apply()) return;
+    const timer = window.setInterval(() => { if (apply()) window.clearInterval(timer); }, 250);
+    return () => window.clearInterval(timer);
+  }, [onDashboard]);
+
+  return (
+    // Der body ist das App-Frame-Grid (Vorgabe Widget-Team, s. index.css):
+    // top/left/center-Areas. #root und dieser Wrapper sind display:contents,
+    // damit Header, Drawer und Content direkte Grid-Items werden. Die
+    // Area-Zuordnung von Header/Drawer liegt in index.css.
+    <div className="contents">
+      {!IS_EMBED && (
+        <la-header-bar-widget title={appgroupLabel()} app-id={APP_ID}>
+          {/* app-id auch am Menü selbst: erst mit eigenem App-Kontext zeigt
+              es die Einstellungs-Sektion (Benutzerverwaltung, Datenansicht,
+              Klar KI, App kopieren, Anleitung, Struktur). */}
+          <la-apps-menu-widget slot="widgets" app-id={APP_ID} />
+          <la-profile-menu-widget slot="widgets" />
+        </la-header-bar-widget>
+      )}
+
+      {/* Overlay-Widgets, die Header (Contact) und Profil-Menü (Profil
+          bearbeiten / Sicherheit) per document.querySelector suchen und über
+          das open-Attribut öffnen — ohne diese Elemente verpuffen die Klicks
+          stumm. Bewusst NICHT in den Header geslottet: als Geschwister bleiben
+          ihre Modals außerhalb des Header-Stacking-Contexts (z-Leiste). */}
+      {!IS_EMBED && (
+        <>
+          <la-feedback-form-widget />
+          <la-user-profile-widget />
+          <la-security-widget />
+          {/* „Aktuelle App kopieren" im Apps-Menü sucht dieses Overlay per
+              querySelector; la-gua-widget (Benutzerverwaltung) erzeugt das
+              Menü dagegen selbst. */}
+          <la-app-group-copy-widget data-grp-id={APPGROUP_ID} />
+        </>
+      )}
+
+      {/* Drawer = Grid-Area "left" (Zuordnung in index.css): In-Flow-Spalte,
+          die den Content selbst verdrängt; eingeklappt ein schmaler Streifen
+          mit Hover-Peek. Mobil ein Fixed-Overlay (verlässt das Grid). */}
+      {!IS_EMBED && (
+        <la-drawer ref={drawerRef}>
+          {/* Darstellung-Umschalter — identisch zur Datenverwaltung: der
+              Dashboard-Eintrag (la-dashboard-link-widget) und die App-Liste
+              der Gruppe (la-app-group-nav-widget → /gateway-Listenseiten). */}
+          <la-nav-section type="secondary" label={t('display_section')}>
+            <la-dashboard-link-widget ref={dashboardLinkRef} app-id={APP_ID} />
+            {/* dense = kleinere Unterpunkt-Schrift (setzt --la-nav-text-size
+                im Sektions-Shadow) — exakt wie die Datenverwaltung im Gateway. */}
+            <la-nav-section type="primary" label={t('data_management')} icon="IconMenu2" dense="">
+              <la-app-group-nav-widget group-id={APPGROUP_ID} />
+            </la-nav-section>
+          </la-nav-section>
+
+          {/* Abläufe — a section like the platform's own lists: one row per
+              flow, the gear row 'Abläufe verwalten' last. Creating, changing
+              and removing flows happens on that page, as 'Seiten verwalten'
+              does for public pages. */}
+          <la-nav-section type="secondary" label={t('intents_heading')}>
+            <IntentsNav />
+          </la-nav-section>
+
+          {/* Aktionen and Dateien — the platform's own widgets, as in the UL4
+              sidebar: la-actions-widget lists the app group's actions from the
+              actions-agent (row = run, code and description buttons, the last
+              row 'Alle Aktionen' opens the full list); la-action-files-widget
+              lists files those actions produced and hides itself — section
+              included — while there are none. Below the widget one more row,
+              'Werkzeuge' (ActionsSidebar), opens the assistant's drawer
+              (<la-klar-assistant actions-open>) — the only place with run,
+              files, triggers, last run, versions and chat per action; the
+              widget alone had lost that entry point in 0.0.386 (0.0.407).
+              New actions are created in the assistant's chat. */}
+          <la-nav-section type="secondary" label={t('actions_section')}>
+            <la-actions-widget group-id={APPGROUP_ID} />
+            <ActionsSidebar />
+          </la-nav-section>
+          <la-nav-section type="secondary" label={t('files_section')}>
+            <la-action-files-widget group-id={APPGROUP_ID} />
+          </la-nav-section>
+
+          {/* Öffentliche Seiten — the platform's own widget, the very element
+              the UL4 template's sidebar renders: it reads this dashboard's
+              public-pages.json, lists every published page (globe icon, opens
+              in a new tab) and ends with the gear row 'Seiten verwalten' →
+              #/verwaltung/oeffentliche-seiten. */}
+          <la-nav-section type="secondary" label={t('ppn_heading')}>
+            <la-public-pages-widget group-id={APPGROUP_ID} />
+          </la-nav-section>
+
+          {/* Sticky Footer, ganz unten: die Version als Meta-Zeile (kein
+              Plattform-Gegenstück; Klar Lab und die Entwickler/Beta-Toggles
+              stecken im Versions-Panel), darunter die dünne Rechtszeile
+              (Figma-Muster). Relative Pfade, damit die Plattform-Seiten auf
+              jedem Host stimmen. */}
+          <div slot="footer" className="border-t border-sidebar-border">
+            <div className="px-2 pt-2">
+              <VersionCheck />
+            </div>
+            <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 py-3 text-sm font-medium text-muted-foreground">
+              <a href="/impressum.htm" className="hover:text-foreground transition-colors">{t('legal_imprint')}</a>
+              <a href="/datenschutz.htm" className="hover:text-foreground transition-colors">{t('legal_privacy')}</a>
+              <a href="/apps.htm" className="hover:text-foreground transition-colors">LivingApps</a>
+            </div>
+          </div>
+        </la-drawer>
+      )}
+
+      {/* center = eigener Scroll-Container (min-h-0 + overflow-y-auto, wie
+          <main> auf den Plattform-Seiten); der Drawer links bleibt stehen. */}
+      <div className="[grid-area:center] min-w-0 min-h-0 overflow-y-auto">
+        <main className={`max-w-screen-2xl ${IS_EMBED ? "p-2 lg:p-4" : "p-6 lg:p-8"}`}>
+          {authError ? (
+            <div className="flex flex-col items-center justify-center py-24 gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-destructive/10 flex items-center justify-center">
+                <IconAlertCircle size={22} className="text-destructive" />
+              </div>
+              <div className="text-center">
+                <h3 className="font-semibold text-foreground mb-1">{t('auth_error_title')}</h3>
+              </div>
+              <Button variant="outline" size="sm" onClick={() => {
+                window.location.href = `${window.location.origin}/login.htm?cugCoUrl=${encodeURIComponent(window.location.href)}`;
+              }}>{t('auth_login_button')}</Button>
+            </div>
+          ) : (
+            <>
+              {location.pathname === '/' && <PlanNotice />}
+              <Outlet />
+            </>
+          )}
+        </main>
+      </div>
+
+      {/* The assistant element (<la-klar-assistant>) mounts in App.tsx,
+          OUTSIDE LocaleGate — its keyed remounts must not tear the element
+          down mid-chat. */}
+    </div>
+  );
+}
+
+```
+
+## src/hooks/useDashboardData.ts
+```
+import { useState, useEffect, useMemo, useCallback } from 'react';
+import type { Kunden, Kundenanfragen, TechnischerAbschluss, Statusprotokoll, Informationsquellen, TechnischeAnforderungen, OffenePunkte, Aufgaben, Beurteilungen, RueckfragenUndKommunikation, Entscheidungen, Erfahrungen, WiederverwendungVonErfahrungen } from '@/types/app';
+import { LivingAppsService } from '@/services/livingAppsService';
+import { t } from '@/i18n';
+
+/** Dashboard data + the OPTIMISTIC-WRITE API.
+ *
+ *  The per-entity setters (`set<Entity>`) are exported for exactly one job:
+ *  optimistic updates on drag writes (onEventDrop / onEventResize /
+ *  onCardMove). Call the setter FIRST — the bar/card lands instantly — then
+ *  fire the PATCH in the background and call `fetchAll()` ONLY in the catch.
+ *  Never await the PATCH before updating state (the UI freezes for the full
+ *  round-trip on every drag) and never refetch after a successful write.
+ *  There is no other mechanism (no `__optimistic`, no `mutate`).
+ */
+/** Entities this hook can load — the same keys the journey layer uses. */
+export type DashboardEntity = 'kunden' | 'kundenanfragen' | 'technischer_abschluss' | 'statusprotokoll' | 'informationsquellen' | 'technische_anforderungen' | 'offene_punkte' | 'aufgaben' | 'beurteilungen' | 'rueckfragen_und_kommunikation' | 'entscheidungen' | 'erfahrungen' | 'wiederverwendung_von_erfahrungen';
+
+export interface DashboardDataOptions {
+  /** Entities this page does NOT need (picked through useRecordSearch instead).
+   *  Every flow page mounts this hook on its own route, so without `omit` a
+   *  page that searches 3.000 guests server-side would still pull all 3.000
+   *  through the side door. */
+  omit?: DashboardEntity[];
+}
+
+export function useDashboardData(options: DashboardDataOptions = {}) {
+  // A string key, not the array: an inline `omit={['gaeste']}` is a new array
+  // on every render and would restart the fetch forever.
+  const omitKey = (options.omit ?? []).slice().sort().join('|');
+  const [kunden, setKunden] = useState<Kunden[]>([]);
+  const [kundenanfragen, setKundenanfragen] = useState<Kundenanfragen[]>([]);
+  const [technischerAbschluss, setTechnischerAbschluss] = useState<TechnischerAbschluss[]>([]);
+  const [statusprotokoll, setStatusprotokoll] = useState<Statusprotokoll[]>([]);
+  const [informationsquellen, setInformationsquellen] = useState<Informationsquellen[]>([]);
+  const [technischeAnforderungen, setTechnischeAnforderungen] = useState<TechnischeAnforderungen[]>([]);
+  const [offenePunkte, setOffenePunkte] = useState<OffenePunkte[]>([]);
+  const [aufgaben, setAufgaben] = useState<Aufgaben[]>([]);
+  const [beurteilungen, setBeurteilungen] = useState<Beurteilungen[]>([]);
+  const [rueckfragenUndKommunikation, setRueckfragenUndKommunikation] = useState<RueckfragenUndKommunikation[]>([]);
+  const [entscheidungen, setEntscheidungen] = useState<Entscheidungen[]>([]);
+  const [erfahrungen, setErfahrungen] = useState<Erfahrungen[]>([]);
+  const [wiederverwendungVonErfahrungen, setWiederverwendungVonErfahrungen] = useState<WiederverwendungVonErfahrungen[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+  /** Lists the signed-in user may not read (403 on the platform). They load as
+   *  empty and the rest of the page loads normally — one forbidden list used to
+   *  empty the whole dashboard (05.10.2026). Hide a block whose list is here. */
+  const [forbidden, setForbidden] = useState<DashboardEntity[]>([]);
+
+  // Every list on its own: a 403 is „not yours“, any other failure is an error.
+  const settle = useCallback((settled: PromiseSettledResult<unknown>[]) => {
+    const denied: DashboardEntity[] = [];
+    let failure: unknown = null;
+    // null = this list failed for another reason: its current data stays
+    const pick = <T,>(i: number, key: DashboardEntity): T[] | null => {
+      const s = settled[i];
+      if (s.status === 'fulfilled') return s.value as T[];
+      if ((s.reason as { status?: number } | null)?.status === 403) { denied.push(key); return []; }
+      failure = failure ?? s.reason;
+      return null;
+    };
+    { const rows = pick<Kunden>(0, 'kunden'); if (rows) setKunden(rows); }
+    { const rows = pick<Kundenanfragen>(1, 'kundenanfragen'); if (rows) setKundenanfragen(rows); }
+    { const rows = pick<TechnischerAbschluss>(2, 'technischer_abschluss'); if (rows) setTechnischerAbschluss(rows); }
+    { const rows = pick<Statusprotokoll>(3, 'statusprotokoll'); if (rows) setStatusprotokoll(rows); }
+    { const rows = pick<Informationsquellen>(4, 'informationsquellen'); if (rows) setInformationsquellen(rows); }
+    { const rows = pick<TechnischeAnforderungen>(5, 'technische_anforderungen'); if (rows) setTechnischeAnforderungen(rows); }
+    { const rows = pick<OffenePunkte>(6, 'offene_punkte'); if (rows) setOffenePunkte(rows); }
+    { const rows = pick<Aufgaben>(7, 'aufgaben'); if (rows) setAufgaben(rows); }
+    { const rows = pick<Beurteilungen>(8, 'beurteilungen'); if (rows) setBeurteilungen(rows); }
+    { const rows = pick<RueckfragenUndKommunikation>(9, 'rueckfragen_und_kommunikation'); if (rows) setRueckfragenUndKommunikation(rows); }
+    { const rows = pick<Entscheidungen>(10, 'entscheidungen'); if (rows) setEntscheidungen(rows); }
+    { const rows = pick<Erfahrungen>(11, 'erfahrungen'); if (rows) setErfahrungen(rows); }
+    { const rows = pick<WiederverwendungVonErfahrungen>(12, 'wiederverwendung_von_erfahrungen'); if (rows) setWiederverwendungVonErfahrungen(rows); }
+    setForbidden(prev => (prev.join('|') === denied.join('|') ? prev : denied));
+    return failure;
+  }, []);
+
+  const fetchAll = useCallback(async () => {
+    setError(null);
+    const omit = new Set(omitKey ? omitKey.split('|') : []);
+    try {
+      const failure = settle(await Promise.allSettled([
+        omit.has('kunden') ? Promise.resolve([] as Kunden[]) : LivingAppsService.getKunden(),
+        omit.has('kundenanfragen') ? Promise.resolve([] as Kundenanfragen[]) : LivingAppsService.getKundenanfragen(),
+        omit.has('technischer_abschluss') ? Promise.resolve([] as TechnischerAbschluss[]) : LivingAppsService.getTechnischerAbschluss(),
+        omit.has('statusprotokoll') ? Promise.resolve([] as Statusprotokoll[]) : LivingAppsService.getStatusprotokoll(),
+        omit.has('informationsquellen') ? Promise.resolve([] as Informationsquellen[]) : LivingAppsService.getInformationsquellen(),
+        omit.has('technische_anforderungen') ? Promise.resolve([] as TechnischeAnforderungen[]) : LivingAppsService.getTechnischeAnforderungen(),
+        omit.has('offene_punkte') ? Promise.resolve([] as OffenePunkte[]) : LivingAppsService.getOffenePunkte(),
+        omit.has('aufgaben') ? Promise.resolve([] as Aufgaben[]) : LivingAppsService.getAufgaben(),
+        omit.has('beurteilungen') ? Promise.resolve([] as Beurteilungen[]) : LivingAppsService.getBeurteilungen(),
+        omit.has('rueckfragen_und_kommunikation') ? Promise.resolve([] as RueckfragenUndKommunikation[]) : LivingAppsService.getRueckfragenUndKommunikation(),
+        omit.has('entscheidungen') ? Promise.resolve([] as Entscheidungen[]) : LivingAppsService.getEntscheidungen(),
+        omit.has('erfahrungen') ? Promise.resolve([] as Erfahrungen[]) : LivingAppsService.getErfahrungen(),
+        omit.has('wiederverwendung_von_erfahrungen') ? Promise.resolve([] as WiederverwendungVonErfahrungen[]) : LivingAppsService.getWiederverwendungVonErfahrungen(),
+      ]));
+      if (failure) throw failure;
+    } catch (err) {
+      setError(err instanceof Error ? err : new Error(t('data_load_failed')));
+    } finally {
+      setLoading(false);
+    }
+  }, [omitKey, settle]);
+
+  useEffect(() => { fetchAll(); }, [fetchAll]);
+
+  // Silent background refresh (no loading state change → no flicker)
+  useEffect(() => {
+    const omit = new Set(omitKey ? omitKey.split('|') : []);
+    async function silentRefresh() {
+      try {
+        // a failed list keeps its stale data out of the way: settle() only
+        // replaces what loaded or was refused
+        settle(await Promise.allSettled([
+          omit.has('kunden') ? Promise.resolve([] as Kunden[]) : LivingAppsService.getKunden(),
+          omit.has('kundenanfragen') ? Promise.resolve([] as Kundenanfragen[]) : LivingAppsService.getKundenanfragen(),
+          omit.has('technischer_abschluss') ? Promise.resolve([] as TechnischerAbschluss[]) : LivingAppsService.getTechnischerAbschluss(),
+          omit.has('statusprotokoll') ? Promise.resolve([] as Statusprotokoll[]) : LivingAppsService.getStatusprotokoll(),
+          omit.has('informationsquellen') ? Promise.resolve([] as Informationsquellen[]) : LivingAppsService.getInformationsquellen(),
+          omit.has('technische_anforderungen') ? Promise.resolve([] as TechnischeAnforderungen[]) : LivingAppsService.getTechnischeAnforderungen(),
+          omit.has('offene_punkte') ? Promise.resolve([] as OffenePunkte[]) : LivingAppsService.getOffenePunkte(),
+          omit.has('aufgaben') ? Promise.resolve([] as Aufgaben[]) : LivingAppsService.getAufgaben(),
+          omit.has('beurteilungen') ? Promise.resolve([] as Beurteilungen[]) : LivingAppsService.getBeurteilungen(),
+          omit.has('rueckfragen_und_kommunikation') ? Promise.resolve([] as RueckfragenUndKommunikation[]) : LivingAppsService.getRueckfragenUndKommunikation(),
+          omit.has('entscheidungen') ? Promise.resolve([] as Entscheidungen[]) : LivingAppsService.getEntscheidungen(),
+          omit.has('erfahrungen') ? Promise.resolve([] as Erfahrungen[]) : LivingAppsService.getErfahrungen(),
+          omit.has('wiederverwendung_von_erfahrungen') ? Promise.resolve([] as WiederverwendungVonErfahrungen[]) : LivingAppsService.getWiederverwendungVonErfahrungen(),
+        ]));
+      } catch {
+        // silently ignore — stale data is better than no data
+      }
+    }
+    function handleRefresh() { void silentRefresh(); }
+    // assistant:data-changed comes from the assistant (<la-klar-assistant>)
+    // after every mutation. The element additionally fires the legacy
+    // dashboard-refresh event for OLD deployed bundles — do NOT subscribe to
+    // both here, or every mutation fetches twice.
+    window.addEventListener('assistant:data-changed', handleRefresh);
+    return () => window.removeEventListener('assistant:data-changed', handleRefresh);
+  }, [omitKey, settle]);
+
+  const kundenMap = useMemo(() => {
+    const m = new Map<string, Kunden>();
+    kunden.forEach(r => m.set(r.record_id, r));
+    return m;
+  }, [kunden]);
+
+  const kundenanfragenMap = useMemo(() => {
+    const m = new Map<string, Kundenanfragen>();
+    kundenanfragen.forEach(r => m.set(r.record_id, r));
+    return m;
+  }, [kundenanfragen]);
+
+  const technischerAbschlussMap = useMemo(() => {
+    const m = new Map<string, TechnischerAbschluss>();
+    technischerAbschluss.forEach(r => m.set(r.record_id, r));
+    return m;
+  }, [technischerAbschluss]);
+
+  const informationsquellenMap = useMemo(() => {
+    const m = new Map<string, Informationsquellen>();
+    informationsquellen.forEach(r => m.set(r.record_id, r));
+    return m;
+  }, [informationsquellen]);
+
+  const technischeAnforderungenMap = useMemo(() => {
+    const m = new Map<string, TechnischeAnforderungen>();
+    technischeAnforderungen.forEach(r => m.set(r.record_id, r));
+    return m;
+  }, [technischeAnforderungen]);
+
+  const offenePunkteMap = useMemo(() => {
+    const m = new Map<string, OffenePunkte>();
+    offenePunkte.forEach(r => m.set(r.record_id, r));
+    return m;
+  }, [offenePunkte]);
+
+  const aufgabenMap = useMemo(() => {
+    const m = new Map<string, Aufgaben>();
+    aufgaben.forEach(r => m.set(r.record_id, r));
+    return m;
+  }, [aufgaben]);
+
+  const beurteilungenMap = useMemo(() => {
+    const m = new Map<string, Beurteilungen>();
+    beurteilungen.forEach(r => m.set(r.record_id, r));
+    return m;
+  }, [beurteilungen]);
+
+  const rueckfragenUndKommunikationMap = useMemo(() => {
+    const m = new Map<string, RueckfragenUndKommunikation>();
+    rueckfragenUndKommunikation.forEach(r => m.set(r.record_id, r));
+    return m;
+  }, [rueckfragenUndKommunikation]);
+
+  const entscheidungenMap = useMemo(() => {
+    const m = new Map<string, Entscheidungen>();
+    entscheidungen.forEach(r => m.set(r.record_id, r));
+    return m;
+  }, [entscheidungen]);
+
+  const erfahrungenMap = useMemo(() => {
+    const m = new Map<string, Erfahrungen>();
+    erfahrungen.forEach(r => m.set(r.record_id, r));
+    return m;
+  }, [erfahrungen]);
+
+  return { kunden, setKunden, kundenanfragen, setKundenanfragen, technischerAbschluss, setTechnischerAbschluss, statusprotokoll, setStatusprotokoll, informationsquellen, setInformationsquellen, technischeAnforderungen, setTechnischeAnforderungen, offenePunkte, setOffenePunkte, aufgaben, setAufgaben, beurteilungen, setBeurteilungen, rueckfragenUndKommunikation, setRueckfragenUndKommunikation, entscheidungen, setEntscheidungen, erfahrungen, setErfahrungen, wiederverwendungVonErfahrungen, setWiederverwendungVonErfahrungen, loading, error, fetchAll, forbidden, kundenMap, kundenanfragenMap, technischerAbschlussMap, informationsquellenMap, technischeAnforderungenMap, offenePunkteMap, aufgabenMap, beurteilungenMap, rueckfragenUndKommunikationMap, entscheidungenMap, erfahrungenMap };
+}
+
+/** The hook's return — the `data` prop of DashboardOverview in the Ready-Wrapper form. */
+export type DashboardData = ReturnType<typeof useDashboardData>;
+```
+
+## src/lib/enrich.ts
+```
+import type { EnrichedAufgaben, EnrichedBeurteilungen, EnrichedEntscheidungen, EnrichedErfahrungen, EnrichedInformationsquellen, EnrichedKundenanfragen, EnrichedOffenePunkte, EnrichedRueckfragenUndKommunikation, EnrichedStatusprotokoll, EnrichedTechnischeAnforderungen, EnrichedTechnischerAbschluss, EnrichedWiederverwendungVonErfahrungen } from '@/types/enriched';
+import type { Aufgaben, Beurteilungen, Entscheidungen, Erfahrungen, Informationsquellen, Kunden, Kundenanfragen, OffenePunkte, RueckfragenUndKommunikation, Statusprotokoll, TechnischeAnforderungen, TechnischerAbschluss, WiederverwendungVonErfahrungen } from '@/types/app';
+import { extractRecordId } from '@/services/livingAppsService';
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function resolveDisplay(url: unknown, map: Map<string, any>, ...fields: string[]): string {
+  if (!url) return '';
+  const id = extractRecordId(url);
+  if (!id) return '';
+  const r = map.get(id);
+  if (!r) return '';
+  return fields.map(f => String(r.fields[f] ?? '')).join(' ').trim();
+}
+
+interface KundenanfragenMaps {
+  kundenMap: Map<string, Kunden>;
+}
+
+export function enrichKundenanfragen(
+  kundenanfragen: Kundenanfragen[],
+  maps: KundenanfragenMaps
+): EnrichedKundenanfragen[] {
+  return kundenanfragen.map(r => ({
+    ...r,
+    kundeName: resolveDisplay(r.fields.kunde, maps.kundenMap, 'kundennummer'),
+  }));
+}
+
+interface TechnischerAbschlussMaps {
+  kundenanfragenMap: Map<string, Kundenanfragen>;
+}
+
+export function enrichTechnischerAbschluss(
+  technischerAbschluss: TechnischerAbschluss[],
+  maps: TechnischerAbschlussMaps
+): EnrichedTechnischerAbschluss[] {
+  return technischerAbschluss.map(r => ({
+    ...r,
+    anfrageName: resolveDisplay(r.fields.anfrage, maps.kundenanfragenMap, 'anfragenummer'),
+  }));
+}
+
+interface StatusprotokollMaps {
+  kundenanfragenMap: Map<string, Kundenanfragen>;
+}
+
+export function enrichStatusprotokoll(
+  statusprotokoll: Statusprotokoll[],
+  maps: StatusprotokollMaps
+): EnrichedStatusprotokoll[] {
+  return statusprotokoll.map(r => ({
+    ...r,
+    anfrageName: resolveDisplay(r.fields.anfrage, maps.kundenanfragenMap, 'anfragenummer'),
+  }));
+}
+
+interface InformationsquellenMaps {
+  informationsquellenMap: Map<string, Informationsquellen>;
+  kundenanfragenMap: Map<string, Kundenanfragen>;
+}
+
+export function enrichInformationsquellen(
+  informationsquellen: Informationsquellen[],
+  maps: InformationsquellenMaps
+): EnrichedInformationsquellen[] {
+  return informationsquellen.map(r => ({
+    ...r,
+    ersetzt_quelleName: resolveDisplay(r.fields.ersetzt_quelle, maps.informationsquellenMap, 'titel'),
+    anfrageName: resolveDisplay(r.fields.anfrage, maps.kundenanfragenMap, 'anfragenummer'),
+  }));
+}
+
+interface TechnischeAnforderungenMaps {
+  kundenanfragenMap: Map<string, Kundenanfragen>;
+  informationsquellenMap: Map<string, Informationsquellen>;
+}
+
+export function enrichTechnischeAnforderungen(
+  technischeAnforderungen: TechnischeAnforderungen[],
+  maps: TechnischeAnforderungenMaps
+): EnrichedTechnischeAnforderungen[] {
+  return technischeAnforderungen.map(r => ({
+    ...r,
+    anfrageName: resolveDisplay(r.fields.anfrage, maps.kundenanfragenMap, 'anfragenummer'),
+    quellenName: resolveDisplay(r.fields.quellen, maps.informationsquellenMap, 'titel'),
+  }));
+}
+
+interface OffenePunkteMaps {
+  technischeAnforderungenMap: Map<string, TechnischeAnforderungen>;
+  informationsquellenMap: Map<string, Informationsquellen>;
+  kundenanfragenMap: Map<string, Kundenanfragen>;
+}
+
+export function enrichOffenePunkte(
+  offenePunkte: OffenePunkte[],
+  maps: OffenePunkteMaps
+): EnrichedOffenePunkte[] {
+  return offenePunkte.map(r => ({
+    ...r,
+    betroffene_anforderungenName: resolveDisplay(r.fields.betroffene_anforderungen, maps.technischeAnforderungenMap, 'bezeichnung'),
+    betroffene_quellenName: resolveDisplay(r.fields.betroffene_quellen, maps.informationsquellenMap, 'titel'),
+    anfrageName: resolveDisplay(r.fields.anfrage, maps.kundenanfragenMap, 'anfragenummer'),
+  }));
+}
+
+interface AufgabenMaps {
+  kundenanfragenMap: Map<string, Kundenanfragen>;
+  offenePunkteMap: Map<string, OffenePunkte>;
+  aufgabenMap: Map<string, Aufgaben>;
+}
+
+export function enrichAufgaben(
+  aufgaben: Aufgaben[],
+  maps: AufgabenMaps
+): EnrichedAufgaben[] {
+  return aufgaben.map(r => ({
+    ...r,
+    anfrageName: resolveDisplay(r.fields.anfrage, maps.kundenanfragenMap, 'anfragenummer'),
+    offener_punktName: resolveDisplay(r.fields.offener_punkt, maps.offenePunkteMap, 'kurztitel'),
+    abhaengige_aufgabenName: resolveDisplay(r.fields.abhaengige_aufgaben, maps.aufgabenMap, 'titel'),
+  }));
+}
+
+interface BeurteilungenMaps {
+  technischeAnforderungenMap: Map<string, TechnischeAnforderungen>;
+  offenePunkteMap: Map<string, OffenePunkte>;
+  informationsquellenMap: Map<string, Informationsquellen>;
+  kundenanfragenMap: Map<string, Kundenanfragen>;
+}
+
+export function enrichBeurteilungen(
+  beurteilungen: Beurteilungen[],
+  maps: BeurteilungenMaps
+): EnrichedBeurteilungen[] {
+  return beurteilungen.map(r => ({
+    ...r,
+    betroffene_anforderungenName: resolveDisplay(r.fields.betroffene_anforderungen, maps.technischeAnforderungenMap, 'bezeichnung'),
+    betroffene_offene_punkteName: resolveDisplay(r.fields.betroffene_offene_punkte, maps.offenePunkteMap, 'kurztitel'),
+    zugrunde_liegende_quellenName: resolveDisplay(r.fields.zugrunde_liegende_quellen, maps.informationsquellenMap, 'titel'),
+    anfrageName: resolveDisplay(r.fields.anfrage, maps.kundenanfragenMap, 'anfragenummer'),
+  }));
+}
+
+interface RueckfragenUndKommunikationMaps {
+  offenePunkteMap: Map<string, OffenePunkte>;
+  rueckfragenUndKommunikationMap: Map<string, RueckfragenUndKommunikation>;
+  informationsquellenMap: Map<string, Informationsquellen>;
+  kundenanfragenMap: Map<string, Kundenanfragen>;
+}
+
+export function enrichRueckfragenUndKommunikation(
+  rueckfragenUndKommunikation: RueckfragenUndKommunikation[],
+  maps: RueckfragenUndKommunikationMaps
+): EnrichedRueckfragenUndKommunikation[] {
+  return rueckfragenUndKommunikation.map(r => ({
+    ...r,
+    zugehoerige_offene_punkteName: resolveDisplay(r.fields.zugehoerige_offene_punkte, maps.offenePunkteMap, 'kurztitel'),
+    beantwortet_nachrichtName: resolveDisplay(r.fields.beantwortet_nachricht, maps.rueckfragenUndKommunikationMap, 'absender'),
+    quelleName: resolveDisplay(r.fields.quelle, maps.informationsquellenMap, 'titel'),
+    anfrageName: resolveDisplay(r.fields.anfrage, maps.kundenanfragenMap, 'anfragenummer'),
+  }));
+}
+
+interface EntscheidungenMaps {
+  technischeAnforderungenMap: Map<string, TechnischeAnforderungen>;
+  offenePunkteMap: Map<string, OffenePunkte>;
+  beurteilungenMap: Map<string, Beurteilungen>;
+  entscheidungenMap: Map<string, Entscheidungen>;
+  kundenanfragenMap: Map<string, Kundenanfragen>;
+}
+
+export function enrichEntscheidungen(
+  entscheidungen: Entscheidungen[],
+  maps: EntscheidungenMaps
+): EnrichedEntscheidungen[] {
+  return entscheidungen.map(r => ({
+    ...r,
+    betroffene_anforderungenName: resolveDisplay(r.fields.betroffene_anforderungen, maps.technischeAnforderungenMap, 'bezeichnung'),
+    betroffene_offene_punkteName: resolveDisplay(r.fields.betroffene_offene_punkte, maps.offenePunkteMap, 'kurztitel'),
+    zugrunde_liegende_beurteilungenName: resolveDisplay(r.fields.zugrunde_liegende_beurteilungen, maps.beurteilungenMap, 'beurteilungsgegenstand'),
+    ersetzt_durch_entscheidungName: resolveDisplay(r.fields.ersetzt_durch_entscheidung, maps.entscheidungenMap, 'titel'),
+    anfrageName: resolveDisplay(r.fields.anfrage, maps.kundenanfragenMap, 'anfragenummer'),
+  }));
+}
+
+interface ErfahrungenMaps {
+  informationsquellenMap: Map<string, Informationsquellen>;
+  beurteilungenMap: Map<string, Beurteilungen>;
+  entscheidungenMap: Map<string, Entscheidungen>;
+  kundenanfragenMap: Map<string, Kundenanfragen>;
+  technischerAbschlussMap: Map<string, TechnischerAbschluss>;
+}
+
+export function enrichErfahrungen(
+  erfahrungen: Erfahrungen[],
+  maps: ErfahrungenMaps
+): EnrichedErfahrungen[] {
+  return erfahrungen.map(r => ({
+    ...r,
+    belegquellenName: resolveDisplay(r.fields.belegquellen, maps.informationsquellenMap, 'titel'),
+    belegbeurteilungenName: resolveDisplay(r.fields.belegbeurteilungen, maps.beurteilungenMap, 'beurteilungsgegenstand'),
+    belegentscheidungenName: resolveDisplay(r.fields.belegentscheidungen, maps.entscheidungenMap, 'titel'),
+    ursprungsanfrageName: resolveDisplay(r.fields.ursprungsanfrage, maps.kundenanfragenMap, 'anfragenummer'),
+    belegabschlussName: resolveDisplay(r.fields.belegabschluss, maps.technischerAbschlussMap, 'geprueft_von'),
+  }));
+}
+
+interface WiederverwendungVonErfahrungenMaps {
+  erfahrungenMap: Map<string, Erfahrungen>;
+  kundenanfragenMap: Map<string, Kundenanfragen>;
+}
+
+export function enrichWiederverwendungVonErfahrungen(
+  wiederverwendungVonErfahrungen: WiederverwendungVonErfahrungen[],
+  maps: WiederverwendungVonErfahrungenMaps
+): EnrichedWiederverwendungVonErfahrungen[] {
+  return wiederverwendungVonErfahrungen.map(r => ({
+    ...r,
+    erfahrungName: resolveDisplay(r.fields.erfahrung, maps.erfahrungenMap, 'titel'),
+    ziel_anfrageName: resolveDisplay(r.fields.ziel_anfrage, maps.kundenanfragenMap, 'anfragenummer'),
+  }));
+}
+
+```
+
+## src/lib/formatters.ts
+```
+import { format, parseISO } from 'date-fns';
+import { CURRENCY, dateFnsLocale, dateFormat, dateTimeFormat, localeTag } from '@/i18n';
+
+// Pattern, month/weekday names and number grouping all follow the ACTIVE
+// locale — read inside the functions, never hoisted, so a language switch
+// takes effect without a rebuild. The currency itself is a property of the
+// data and stays fixed at the build-time choice (CURRENCY).
+export function formatDate(s: string | undefined) {
+  if (!s) return '—';
+  try { return format(parseISO(s), dateFormat(), { locale: dateFnsLocale() }); } catch { return s; }
+}
+
+export function formatDateTime(s: string | undefined) {
+  if (!s) return '—';
+  try { return format(parseISO(s), dateTimeFormat(), { locale: dateFnsLocale() }); } catch { return s; }
+}
+
+export function formatCurrency(v: number | undefined) {
+  if (v == null) return '—';
+  return new Intl.NumberFormat(localeTag(), { style: 'currency', currency: CURRENCY }).format(v);
+}
+
+/** Extract display label from lookup/select or lookup/radio API response */
+export function displayLookup(val: unknown, options?: {key: string, label: string}[]): string {
+  if (val == null) return '—';
+  if (typeof val === 'object' && val !== null && 'label' in val) return String((val as Record<string, unknown>).label);
+  if (options && typeof val === 'string') { const m = options.find(o => o.key === val); if (m) return m.label; }
+  return String(val);
+}
+
+/** Extract labels from multiplelookup/checkbox API response */
+export function displayMultiLookup(val: unknown, options?: {key: string, label: string}[]): string {
+  if (val == null) return '—';
+  if (Array.isArray(val)) return val.map(v => {
+    if (typeof v === 'object' && v !== null && 'label' in v) return String((v as Record<string, unknown>).label);
+    if (options && typeof v === 'string') { const m = options.find(o => o.key === v); if (m) return m.label; }
+    return String(v);
+  }).join(', ') || '—';
+  return displayLookup(val, options);
+}
+
+/** Extract key from lookup value (handles both {key,label} objects and plain strings) */
+export function lookupKey(val: unknown): string | undefined {
+  if (val == null) return undefined;
+  if (typeof val === 'object' && val !== null && 'key' in val) return String((val as Record<string, unknown>).key);
+  if (typeof val === 'string') return val;
+  return undefined;
+}
+
+/** Extract keys from multiplelookup value */
+export function lookupKeys(val: unknown): string[] {
+  if (!Array.isArray(val)) return [];
+  return val.map(v => typeof v === 'object' && v !== null && 'key' in v ? String((v as Record<string, unknown>).key) : String(v));
+}
+```

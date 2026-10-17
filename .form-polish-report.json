@@ -1,0 +1,127 @@
+{
+  "entities": {
+    "Kunden": {
+      "placeholders_set": 11,
+      "defaults_keys": [
+        "aktiv"
+      ],
+      "computed_keys": [],
+      "reason": "Reine Stammdaten ohne numerische Felder, daher keine Formeln; nur der Kunde ist standardmäßig aktiv."
+    },
+    "Kundenanfragen": {
+      "placeholders_set": 25,
+      "defaults_keys": [
+        "eingangsdatum",
+        "status",
+        "zieltermin_klaerung"
+      ],
+      "computed_keys": [
+        "_gesamtzeit_min"
+      ],
+      "reason": "Die virtuelle Gesamtzeit summiert aktive Bearbeitung und beide Wartezeiten in Minuten; Datumspaare ohne Dauerfeld und keine Preise per Lookup vorhanden."
+    },
+    "Technischer Abschluss": {
+      "placeholders_set": 9,
+      "defaults_keys": [
+        "pruefdatum",
+        "uebergabestatus",
+        "freigabestatus"
+      ],
+      "computed_keys": [],
+      "reason": "Keine Formeln, da der Abschluss keine eigenen Zahlenfelder oder Datumspaare zur Berechnung enthält."
+    },
+    "Statusprotokoll": {
+      "placeholders_set": 9,
+      "defaults_keys": [
+        "zeitpunkt"
+      ],
+      "computed_keys": [],
+      "reason": "Statusprotokoll hat keine numerischen Felder und nur einen einzelnen Zeitpunkt, daher gibt es keine Formel."
+    },
+    "Informationsquellen": {
+      "placeholders_set": 13,
+      "defaults_keys": [
+        "eingangszeitpunkt",
+        "quellenstatus",
+        "extraktionsstatus"
+      ],
+      "computed_keys": [],
+      "reason": "Keine Formeln, da es keine numerischen Felder oder Datumspaare gibt und die Anfrage-Werte hier nicht sinnvoll verrechenbar sind."
+    },
+    "Technische Anforderungen": {
+      "placeholders_set": 17,
+      "defaults_keys": [
+        "pruefstatus",
+        "gueltig_ab"
+      ],
+      "computed_keys": [],
+      "reason": "Keine Formel, da Soll-, Mindest- und Höchstwerte Spezifikationen sind und keine Mengen- oder Preiskette bilden; Gültigkeitsdaten ergeben keine sinnvolle Dauer."
+    },
+    "Offene Punkte": {
+      "placeholders_set": 16,
+      "defaults_keys": [
+        "status",
+        "prioritaet",
+        "faellig_am"
+      ],
+      "computed_keys": [],
+      "reason": "Keine Formel, da keine Datumspaare oder Mengen-Preis-Beziehungen vorliegen und die numerischen Zielfelder nur Stammdaten der Anfrage sind."
+    },
+    "Aufgaben": {
+      "placeholders_set": 14,
+      "defaults_keys": [
+        "status",
+        "prioritaet",
+        "faellig_am"
+      ],
+      "computed_keys": [],
+      "reason": "Keine Formel, da die Aufgabe keine eigenen Zahlenfelder hat und Werte der Anfrage nicht sinnvoll verrechnet werden können."
+    },
+    "Beurteilungen": {
+      "placeholders_set": 15,
+      "defaults_keys": [
+        "erstellt_am",
+        "pruefstatus"
+      ],
+      "computed_keys": [],
+      "reason": "Keine Formeln, da die Beurteilung nur Text, Status und Zeitstempel enthält und keine sinnvolle Berechnung aus Zahlen oder Datumspaaren ergibt."
+    },
+    "Rückfragen und Kommunikation": {
+      "placeholders_set": 15,
+      "defaults_keys": [
+        "versandstatus",
+        "antwortstatus",
+        "antwort_erwartet_bis"
+      ],
+      "computed_keys": [],
+      "reason": "Keine Formeln, da das Formular keine eigenen numerischen Felder oder Datumspaare mit sinnvoller Dauer enthält."
+    },
+    "Entscheidungen": {
+      "placeholders_set": 17,
+      "defaults_keys": [
+        "entscheidungsstatus"
+      ],
+      "computed_keys": [],
+      "reason": "Keine Formeln, da das Formular keine eigenen numerischen Felder oder Datumspaare mit Dauer enthält und Entscheidungsdatum und Gültig bis keine sinnvolle Dauer ergeben."
+    },
+    "Erfahrungen": {
+      "placeholders_set": 0,
+      "defaults_keys": [
+        "bestaetigungsstatus",
+        "wiederverwendungsstatus",
+        "gueltig_ab"
+      ],
+      "computed_keys": [],
+      "reason": "Keine Formeln, da es sich um beschreibende Wissenseinträge ohne eigene numerische Felder handelt."
+    },
+    "Wiederverwendung von Erfahrungen": {
+      "placeholders_set": 12,
+      "defaults_keys": [
+        "abrufdatum",
+        "bewertet_am"
+      ],
+      "computed_keys": [],
+      "reason": "Keine Formeln, da Ersparnisse manuell eingegebene Schätzungen und Beobachtungen sind und kein Datumspaar oder Preis vorliegt."
+    }
+  }
+}

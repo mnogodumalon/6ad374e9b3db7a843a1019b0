@@ -1,0 +1,946 @@
+KLAR-Anwendung: Technische Auftragsklärung
+
+1. Ziel und Auftrag
+
+Erstelle eine funktionsfähige Anwendung zur technischen Auftragsklärung in einem Unternehmen, das kundenspezifische oder variantenreiche Produkte herstellt.
+
+Die Anwendung unterstützt den Prozess von der Erfassung einer Kundenanfrage bis zur dokumentierten technischen Klärung und Übergabe eines technisch geprüften Auftragsentwurfs.
+
+Sie soll sicherstellen, dass:
+
+Kundenanforderungen vollständig und nachvollziehbar erfasst werden.
+Informationen aus unterschiedlichen Quellen zusammengeführt werden können.
+Fehlende Angaben, Widersprüche und technische Risiken sichtbar werden.
+Die richtigen Personen zur richtigen Zeit einbezogen werden.
+Rückfragen strukturiert formuliert, versendet und beantwortet werden können.
+Fachliche Beurteilungen und Entscheidungen nachvollziehbar dokumentiert sind.
+Änderungen an Informationen mit den davon betroffenen offenen Punkten, Beurteilungen und Entscheidungen verknüpft werden.
+Der technische Klärungsstand jederzeit erkennbar ist.
+Erfahrungen aus abgeschlossenen Vorhaben für spätere vergleichbare Aufträge nutzbar werden.
+Die Anwendung darf nicht lediglich ein Formular zur Erfassung von Aufträgen sein. Sie muss den tatsächlichen Arbeitsprozess unterstützen und die Zusammenhänge zwischen Informationen, Aufgaben, Kommunikation, Beurteilungen und Entscheidungen abbilden.
+
+Wichtig: Entwickle eine überschaubare, praxistaugliche erste Version. Erzeuge keine unnötig komplexe Unternehmensplattform. Implementiere die nachfolgenden Anforderungen, soweit die vorhandenen KLAR-Funktionen dies ermöglichen. Fehlende technische Möglichkeiten dürfen nicht durch vorgetäuschte Funktionen ersetzt werden.
+
+
+2. Grundprinzipien
+
+2.1 Nachvollziehbarkeit
+
+Jede wichtige Information soll möglichst erkennen lassen:
+
+Was ist bekannt?
+Woher stammt die Information?
+Für welches Vorhaben gilt sie?
+Wann wurde sie erfasst oder geändert?
+Wer hat sie beigetragen oder bestätigt?
+Ist sie gesichert, vorläufig, strittig oder überholt?
+Informationen aus Kundenunterlagen, E-Mails, Gesprächen und internen Systemen dürfen nicht ununterscheidbar vermischt werden.
+
+2.2 Trennung von Sachverhalt, Beurteilung und Entscheidung
+
+Unterscheide konsequent zwischen:
+
+Information: Was wurde mitgeteilt oder festgestellt?
+Beurteilung: Wie ist die Information fachlich einzuschätzen?
+Entscheidung: Was wurde verbindlich festgelegt?
+Ergebnis: Was ist anschließend tatsächlich passiert?
+Erkenntnis: Was lässt sich daraus für zukünftige Vorhaben lernen?
+Eine KI-generierte Aussage ist zunächst ein Vorschlag. Sie darf nicht automatisch als bestätigte Tatsache oder verbindliche technische Entscheidung behandelt werden.
+
+2.3 Verantwortlichkeit
+
+Jede offene Aufgabe, Rückfrage und notwendige Entscheidung muss einer zuständigen Person oder Rolle zugeordnet werden können.
+
+Die Anwendung darf keine verbindlichen technischen Freigaben automatisch erteilen, sofern dafür nicht ausdrücklich eine autorisierte, nachvollziehbare Geschäftsregel hinterlegt wurde.
+
+2.4 Änderbarkeit und Erweiterbarkeit
+
+Die Anwendung soll neue Produkte, Anforderungen, Prüfschritte, Rollen und Entscheidungsregeln aufnehmen können, ohne dass der gesamte Prozess neu erstellt werden muss.
+
+2.5 Nutzerorientierung
+
+Die Benutzeroberfläche soll die jeweils nächste sinnvolle Tätigkeit unterstützen. Anwender sollen nicht sämtliche Datenfelder und Module gleichzeitig verstehen müssen.
+
+Zeige relevante Informationen kontextbezogen und blende nicht benötigte Details aus.
+
+
+3. Datenmodell und Moduldefinitionen
+
+Erstelle die folgenden Module als fachlich zusammenhängende Datenobjekte.
+
+Verwende stabile, eindeutige IDs für die Objekte. Beziehungen sollen über diese IDs abgebildet werden, nicht allein über frei eingegebene Namen.
+
+Die angegebenen Feldtypen sind fachliche Anforderungen. Verwende jeweils den nächstgeeigneten, von KLAR unterstützten Datentyp.
+
+Für jedes Feld sind, soweit technisch unterstützt, Datentyp, Pflichtfeldstatus, Standardwert, Validierung, Auswahlwerte, Änderbarkeit und gegebenenfalls Sichtbarkeit festzulegen.
+
+Modul A: Kunden
+
+Zweck: Zentrale Verwaltung der Kunden, für die Anfragen und Aufträge bearbeitet werden.
+
+Felder:
+
+kunden_id: eindeutige ID, automatisch erzeugt, unveränderlich.
+kundennummer: Text, eindeutig, optional.
+firmenname: Text, Pflichtfeld.
+ansprechpartner: Text, optional.
+e_mail: E-Mail, optional, Formatprüfung.
+telefon: Text, optional.
+adresse: mehrzeiliger Text, optional.
+branche: Auswahlfeld oder Text, optional.
+interne_bemerkung: mehrzeiliger Text, optional.
+aktiv: Ja/Nein, Standardwert Ja.
+erstellt_am: Datum und Uhrzeit, automatisch.
+geändert_am: Datum und Uhrzeit, automatisch, sofern unterstützt.
+Beziehungen:
+
+Ein Kunde kann mehrere Kundenanfragen haben.
+Eine Kundenanfrage gehört genau einem Kunden.
+Ansprechpartner und Kontaktdaten können bei Bedarf auf Anfrageebene konkretisiert werden, ohne die zentralen Kundendaten unbemerkt zu verändern.
+Modul B: Kundenanfragen
+
+Zweck: Abbildung des ursprünglichen Kundenwunsches und des daraus entstehenden Klärungsbedarfs.
+
+Felder:
+
+anfrage_id: eindeutige ID, automatisch erzeugt.
+anfragenummer: automatisch erzeugte, lesbare Nummer, sofern unterstützt.
+kunde_id: Pflichtbeziehung zum Modul Kunden.
+eingangsdatum: Datum, Pflichtfeld, Standardwert aktuelles Datum.
+eingangskanal: Auswahlfeld: E-Mail, Webformular, Telefon, persönliches Gespräch, Bestandskunde, sonstiger Kanal.
+kundenreferenz: Text, optional.
+produkt_oder_produktfamilie: Text oder Beziehung zu einem Produktmodul, falls vorhanden.
+produktvariante: Text, optional.
+gewünschte_menge: Zahl, optional, größer als null, sofern angegeben.
+gewünschter_liefertermin: Datum, optional.
+anfragebeschreibung: mehrzeiliger Text, Pflichtfeld.
+ursprüngliche_kundenanforderungen: mehrzeiliger Text, Pflichtfeld.
+priorität: Auswahlfeld: Niedrig, Normal, Hoch, Kritisch.
+verantwortlicher: Benutzer- oder Rollenfeld, Pflichtfeld nach Übernahme.
+status: Auswahlfeld: Neu, In Prüfung, Rückfragen offen, Fachliche Prüfung, Entscheidungsbedarf, Technisch geklärt, Freigegeben, Abgelehnt, Zurückgestellt.
+technischer_kläraufwand: Auswahlfeld: Klein, Mittel, Hoch, noch unbekannt.
+zieltermin_klärung: Datum, optional.
+vollständigkeit: Auswahlfeld oder berechneter Status: Ungeprüft, Unvollständig, In Klärung, Vollständig geprüft.
+erstellt_am: Datum und Uhrzeit, automatisch.
+geändert_am: Datum und Uhrzeit, automatisch.
+Validierungen:
+
+Eine Anfrage benötigt einen Kunden und eine verständliche Beschreibung.
+Eine Anfrage darf nicht allein deshalb als technisch geklärt gelten, weil alle Pflichtfelder ausgefüllt sind.
+Der Status „Technisch geklärt“ darf erst gesetzt werden, wenn die erforderlichen Prüfungen abgeschlossen und alle zwingenden offenen Punkte geklärt oder ausdrücklich autorisiert entschieden wurden.
+Beziehungen:
+
+Eine Kundenanfrage kann mehrere technische Anforderungen, Dokumente, offene Punkte, Aufgaben, Beurteilungen, Rückfragen und Entscheidungen besitzen.
+Die Anfrage ist der zentrale Ausgangspunkt für die weiteren Module.
+Modul C: Technische Anforderungen
+
+Zweck: Einzelne fachliche oder technische Anforderungen aus einer Anfrage strukturiert abbilden.
+
+Jede Anforderung soll unabhängig von anderen Anforderungen geprüft werden können.
+
+Felder:
+
+anforderung_id: eindeutige ID.
+anfrage_id: Pflichtbeziehung zur Kundenanfrage.
+bezeichnung: Text, Pflichtfeld.
+beschreibung: mehrzeiliger Text, Pflichtfeld.
+anforderungstyp: Auswahlfeld: Abmessung, Material, Leistung, Funktion, Schnittstelle, Norm, Sicherheit, Umweltbedingung, Qualität, Liefertermin, Dokumentation, Sonstiges.
+ursprung: Auswahlfeld: Explizite Kundenangabe, Kundenunterlage, interne Vorgabe, technische Ableitung, Erfahrungswissen, KI-Vorschlag.
+quellreferenz_id: optionale Beziehung zu einer Quelle.
+sollwert: Text oder Zahl, je nach Anforderung.
+einheit: Text, optional.
+vergleichsoperator: Auswahlfeld, falls numerisch relevant: Gleich, Größer als, Größer oder gleich, Kleiner als, Kleiner oder gleich, Zwischen.
+min_wert: Zahl, optional.
+max_wert: Zahl, optional.
+ist_pflichtanforderung: Ja/Nein, Standardwert Nein; bei unklarer Einstufung muss eine Prüfung erfolgen.
+prüfstatus: Auswahlfeld: Ungeprüft, Zu prüfen, Bestätigt, Unklar, Widersprüchlich, Nicht erfüllt, Nicht anwendbar.
+begründung_prüfstatus: mehrzeiliger Text, erforderlich bei kritischen Abweichungen und Entscheidungen.
+verantwortlicher: Benutzer- oder Rollenfeld.
+gültig_ab: Datum, optional.
+gültig_bis: Datum, optional.
+erstellt_am: Datum und Uhrzeit, automatisch.
+geändert_am: Datum und Uhrzeit, automatisch.
+Regeln:
+
+Eine Anforderung muss auf ihre Herkunft zurückführbar sein, soweit eine Quelle existiert.
+Eine technische Ableitung darf nicht als ausdrückliche Kundenanforderung ausgegeben werden.
+Widersprüchliche Anforderungen müssen sichtbar bleiben, bis sie geklärt oder durch eine zuständige Person entschieden wurden.
+Anforderungen können mit mehreren Quellen, Beurteilungen, offenen Punkten und Entscheidungen verbunden sein.
+Modul D: Informationsquellen und Dokumente
+
+Zweck: Herkunft und Inhalt relevanter Informationen nachvollziehbar machen.
+
+Felder:
+
+quelle_id: eindeutige ID.
+anfrage_id: Pflichtbeziehung zur Kundenanfrage.
+quellentyp: Auswahlfeld: E-Mail, PDF, Office-Dokument, Bild, Zeichnung, CAD-Dokument, Webadresse, Gesprächsnotiz, ERP-Datensatz, manuelle Eingabe, sonstige Quelle.
+titel: Text, Pflichtfeld.
+datei_oder_referenz: Datei-Upload, URL oder Referenz auf ein bestehendes Dokument, abhängig von KLAR-Funktionen.
+absender_oder_urheber: Text, optional.
+quellendatum: Datum, optional.
+eingangsdatum: Datum und Uhrzeit, automatisch oder manuell.
+versionskennung: Text, optional.
+quellenstatus: Auswahlfeld: Aktuell, Ersetzt, Ungeprüft, Strittig, Ungültig.
+inhaltliche_zusammenfassung: mehrzeiliger Text, optional.
+extraktionsstatus: Auswahlfeld: Nicht verarbeitet, In Bearbeitung, Extrahiert, Manuell geprüft, Fehler.
+prüfung_durch: Benutzerfeld, optional.
+prüfung_am: Datum und Uhrzeit, optional.
+bemerkung: mehrzeiliger Text, optional.
+Regeln:
+
+Dokumente und Quellen müssen möglichst unverändert erhalten bleiben.
+Extrahierte Inhalte müssen auf die jeweilige Quelle zurückgeführt werden können.
+Neue Dokumentversionen dürfen ältere Aussagen nicht unbemerkt überschreiben.
+Eine Quelle kann mehreren Anforderungen, offenen Punkten und Beurteilungen zugeordnet werden.
+Wenn KLAR keinen echten Datei-Upload, keine Dokumentversionierung oder keine automatische Extraktion unterstützt, bilde die verfügbaren Funktionen ehrlich ab und verwende nachvollziehbare Referenzen.
+Modul E: Offene Punkte und Klärungsbedarf
+
+Zweck: Fehlende Informationen, Widersprüche, Risiken und notwendige Prüfungen systematisch bearbeiten.
+
+Felder:
+
+offener_punkt_id: eindeutige ID.
+anfrage_id: Pflichtbeziehung zur Kundenanfrage.
+kurztitel: Text, Pflichtfeld.
+beschreibung: mehrzeiliger Text, Pflichtfeld.
+punktetyp: Auswahlfeld: Fehlende Information, Widerspruch, Technische Prüfung, Normenprüfung, Machbarkeit, Risiko, Rückfrage, Freigabe, Sonstiges.
+betroffene_anforderungen: Mehrfachbeziehung zu technischen Anforderungen.
+betroffene_quellen: Mehrfachbeziehung zu Informationsquellen.
+priorität: Auswahlfeld: Niedrig, Normal, Hoch, Kritisch.
+auswirkung: Auswahlfeld: Qualität, Sicherheit, Funktion, Kosten, Termin, Herstellbarkeit, Normenkonformität, Sonstiges.
+zuständige_rolle: Auswahlfeld oder Rollenbeziehung, sofern verfügbar.
+verantwortlicher: Benutzerfeld.
+fällig_am: Datum, optional.
+status: Auswahlfeld: Neu, Zugewiesen, In Bearbeitung, Wartet auf Kunde, Wartet intern, Zur Entscheidung, Erledigt, Entschieden akzeptiert, Nicht mehr relevant.
+erledigungskriterium: mehrzeiliger Text, optional.
+lösung_oder_ergebnis: mehrzeiliger Text, erforderlich beim Abschluss.
+abgeschlossen_am: Datum und Uhrzeit, optional.
+abschluss_durch: Benutzerfeld, optional.
+Regeln:
+
+Jeder offene Punkt muss einen nachvollziehbaren Grund haben.
+Kritische offene Punkte müssen besonders sichtbar sein.
+Ein Punkt gilt nicht als erledigt, nur weil eine Nachricht versendet wurde.
+Beim Abschluss ist das Ergebnis zu dokumentieren.
+Ein offener Punkt kann eine Aufgabe, Rückfrage, Beurteilung oder Entscheidung auslösen.
+Wird eine relevante Information geändert, muss erkennbar sein, welche offenen Punkte erneut geprüft werden müssen.
+Modul F: Aufgaben und Tätigkeiten
+
+Zweck: Die konkreten Arbeiten zur technischen Auftragsklärung koordinieren.
+
+Felder:
+
+aufgabe_id: eindeutige ID.
+anfrage_id: Pflichtbeziehung zur Kundenanfrage.
+offener_punkt_id: optionale Beziehung zu einem offenen Punkt.
+titel: Text, Pflichtfeld.
+beschreibung: mehrzeiliger Text.
+aufgabentyp: Auswahlfeld: Informationsprüfung, Technische Bewertung, Kundenrückfrage, Interne Rückfrage, Normenprüfung, Machbarkeitsprüfung, Dokumentation, Entscheidung vorbereiten, Freigabeprüfung, Sonstiges.
+verantwortlicher: Benutzerfeld, Pflichtfeld.
+mitwirkende: Mehrfachauswahl oder Benutzerbeziehungen, optional.
+priorität: Auswahlfeld: Niedrig, Normal, Hoch, Kritisch.
+status: Auswahlfeld: Offen, In Bearbeitung, Blockiert, Wartet auf Antwort, Erledigt, Abgebrochen.
+fällig_am: Datum, optional.
+abhängige_aufgaben: Mehrfachbeziehung zu Aufgaben, sofern unterstützt.
+ergebnis: mehrzeiliger Text, optional.
+abgeschlossen_am: Datum und Uhrzeit, optional.
+erstellt_am: Datum und Uhrzeit, automatisch.
+Regeln:
+
+Aufgaben müssen klar beschreiben, welches Ergebnis erwartet wird.
+Blockierte Aufgaben müssen den Blockierungsgrund und den benötigten nächsten Schritt zeigen.
+Aufgaben mit abgelaufener Frist sollen sichtbar markiert werden.
+Aufgaben dürfen nicht automatisch als erledigt gelten, wenn lediglich eine KI-Antwort vorliegt.
+Modul G: Beurteilungen
+
+Zweck: Fachliche Einschätzungen dokumentieren, bevor eine verbindliche Entscheidung getroffen wird.
+
+Felder:
+
+beurteilung_id: eindeutige ID.
+anfrage_id: Pflichtbeziehung zur Kundenanfrage.
+beurteilungsgegenstand: Text, Pflichtfeld.
+betroffene_anforderungen: Mehrfachbeziehung.
+betroffene_offene_punkte: Mehrfachbeziehung.
+beurteilungsart: Auswahlfeld: Technische Machbarkeit, Vollständigkeit, Risiko, Qualität, Normenkonformität, Termin, Kostenwirkung, Herstellbarkeit, Sonstiges.
+einschätzung: Auswahlfeld: Positiv, Bedingt positiv, Negativ, Unklar, Nicht anwendbar.
+fachliche_begründung: mehrzeiliger Text, Pflichtfeld.
+zugrunde_liegende_informationen: Mehrfachbeziehung zu Quellen und Anforderungen.
+annahmen: mehrzeiliger Text, optional.
+unsicherheiten: mehrzeiliger Text, optional.
+alternativen: mehrzeiliger Text, optional.
+empfehlung: mehrzeiliger Text, optional.
+erstellt_von: Benutzerfeld oder Kennzeichnung des Erstellers.
+erstellt_am: Datum und Uhrzeit, automatisch.
+prüfstatus: Auswahlfeld: Entwurf, Fachlich geprüft, Bestätigt, Überholt.
+geprüft_von: Benutzerfeld, optional.
+geprüft_am: Datum und Uhrzeit, optional.
+Regeln:
+
+Beurteilungen müssen von den zugrunde liegenden Informationen unterscheidbar bleiben.
+Annahmen und Unsicherheiten dürfen nicht als gesicherte Tatsachen erscheinen.
+KI-generierte Beurteilungen müssen als KI-Vorschläge erkennbar sein.
+Fachliche Bestätigung muss durch eine berechtigte Person erfolgen, soweit die jeweilige Beurteilung dies erfordert.
+Ändern sich wesentliche Grundlagen, muss die Gültigkeit der Beurteilung erneut geprüft werden.
+Modul H: Rückfragen und Kommunikation
+
+Zweck: Kundenkommunikation und interne Klärung so organisieren, dass Fragen, Antworten und daraus entstehende Änderungen zusammenbleiben.
+
+Felder:
+
+kommunikation_id: eindeutige ID.
+anfrage_id: Pflichtbeziehung zur Kundenanfrage.
+offener_punkt_id: optionale Beziehung zu einem offenen Punkt.
+kommunikationstyp: Auswahlfeld: Kundenrückfrage, Interne Anfrage, Antwort, Information, Eskalation, Gesprächsprotokoll.
+kanal: Auswahlfeld: E-Mail, Telefon, Besprechung, Chat, persönliches Gespräch, Sonstiges.
+absender: Benutzer- oder Textfeld.
+empfänger: Text oder Benutzerbeziehung, möglichst Mehrfachauswahl.
+betreff: Text, Pflichtfeld.
+inhalt: mehrzeiliger Text, Pflichtfeld.
+zugehörige_fragen: Mehrfachbeziehung zu Rückfragen oder offenen Punkten, sofern als separates Modul implementiert.
+versandstatus: Auswahlfeld: Entwurf, Zur Prüfung, Freigegeben, Versendet, Fehlgeschlagen, Nicht erforderlich.
+versanddatum: Datum und Uhrzeit, optional.
+antwort_erwartet_bis: Datum, optional.
+antwort_erhalten_am: Datum und Uhrzeit, optional.
+antwortstatus: Auswahlfeld: Offen, Teilweise beantwortet, Beantwortet, Unklar, Widersprüchlich.
+quelle_id: optionale Beziehung zur ursprünglichen Nachricht oder Dokumentquelle.
+notizen: mehrzeiliger Text, optional.
+Regeln:
+
+Mehrere Fragen an denselben Empfänger sollen nach Möglichkeit gebündelt werden.
+Vor dem Versand müssen Empfänger, Inhalt und zugehörige offene Punkte geprüft werden.
+Der Versand einer Nachricht muss als tatsächlicher Versand erkennbar sein; das Erstellen eines Entwurfs ist kein Versand.
+Antworten müssen den zugehörigen Fragen und offenen Punkten zugeordnet werden können.
+Eine Antwort kann mehrere Fragen betreffen.
+Unvollständige oder widersprüchliche Antworten müssen sichtbar bleiben.
+Änderungen an einer Anforderung aufgrund einer Antwort müssen nachvollziehbar dokumentiert werden.
+Versende Nachrichten nur dann tatsächlich, wenn eine entsprechende Integration vorhanden und der Versand autorisiert ist. Andernfalls erstelle einen freizugebenden Entwurf.
+Modul I: Entscheidungen
+
+Zweck: Verbindliche Festlegungen nachvollziehbar dokumentieren.
+
+Felder:
+
+entscheidung_id: eindeutige ID.
+anfrage_id: Pflichtbeziehung zur Kundenanfrage.
+titel: Text, Pflichtfeld.
+entscheidungsgegenstand: mehrzeiliger Text, Pflichtfeld.
+entscheidungstyp: Auswahlfeld: Technische Freigabe, Abweichung akzeptieren, Alternative auswählen, Anforderung ändern, Risiko akzeptieren, Rückfrage abschließen, Ablehnung, Eskalation, Sonstiges.
+betroffene_anforderungen: Mehrfachbeziehung.
+betroffene_offene_punkte: Mehrfachbeziehung.
+zugrunde_liegende_beurteilungen: Mehrfachbeziehung.
+alternativen: mehrzeiliger Text, optional.
+entscheidung: mehrzeiliger Text, Pflichtfeld.
+begründung: mehrzeiliger Text, Pflichtfeld.
+entscheidungsverantwortlicher: Benutzerfeld, Pflichtfeld.
+entscheidungskompetenz_geprüft: Ja/Nein, Pflichtfeld bei verbindlichen Entscheidungen.
+entscheidungsstatus: Auswahlfeld: Vorbereitung, Zur Entscheidung, Entschieden, Zurückgestellt, Ersetzt.
+entscheidungsdatum: Datum und Uhrzeit, optional.
+auflagen: mehrzeiliger Text, optional.
+gültig_bis: Datum, optional.
+ersetzt_durch_entscheidung_id: optionale Selbstbeziehung.
+ergebnis: mehrzeiliger Text, optional.
+Regeln:
+
+Eine Empfehlung ist keine Entscheidung.
+Eine KI darf eine Entscheidung vorbereiten, aber nicht eigenmächtig eine technische Freigabe erteilen.
+Entscheidungen müssen auf die relevanten Informationen und Beurteilungen zurückführbar sein.
+Abweichungen von Anforderungen müssen ausdrücklich dokumentiert werden.
+Wenn eine Entscheidung durch neue Informationen überholt wird, bleibt sie als historische Entscheidung nachvollziehbar.
+Entscheidungen mit Sicherheits-, Normen- oder erheblichen Qualitätsauswirkungen erfordern die dafür vorgesehene fachliche Autorisierung.
+Modul J: Prüfergebnisse und Abschluss
+
+Zweck: Den tatsächlichen Abschluss der technischen Auftragsklärung dokumentieren.
+
+Felder:
+
+abschluss_id: eindeutige ID.
+anfrage_id: eindeutige Beziehung zur Kundenanfrage.
+prüfdatum: Datum und Uhrzeit.
+geprüft_von: Benutzerfeld.
+anforderungen_geprüft: Ja/Nein.
+kritische_punkte_geklärt: Ja/Nein.
+erforderliche_entscheidungen_vorhanden: Ja/Nein.
+erforderliche_freigaben_vorhanden: Ja/Nein.
+verbleibende_abweichungen: mehrzeiliger Text.
+verbleibende_risiken: mehrzeiliger Text.
+übergabeempfänger: Benutzer oder Rolle.
+übergabestatus: Auswahlfeld: Nicht vorbereitet, Bereit zur Übergabe, Übergeben, Zurückgewiesen.
+übergabedatum: Datum und Uhrzeit, optional.
+zusammenfassung: mehrzeiliger Text.
+freigabestatus: Auswahlfeld: Nicht freigegeben, Freigegeben, Freigabe verweigert, Zurückgestellt.
+Regeln:
+
+Eine Freigabe setzt die erforderlichen Prüfungen und Entscheidungen voraus.
+Verbleibende Abweichungen und Risiken müssen sichtbar sein.
+Eine technische Freigabe darf nicht mit einer kaufmännischen Freigabe oder einem Produktionsstart verwechselt werden.
+Die Übergabe muss den aktuellen technischen Stand und die offenen Restpunkte klar ausweisen.
+Modul K: Erfahrungen und Erkenntnisse
+
+Zweck: Wiederverwendbare Erfahrungen aus abgeschlossenen oder ausreichend weit fortgeschrittenen Vorhaben festhalten.
+
+Felder:
+
+erfahrung_id: eindeutige ID.
+ursprungs_anfrage_id: Pflichtbeziehung zur ursprünglichen Kundenanfrage.
+titel: Text, Pflichtfeld.
+sachverhalt: mehrzeiliger Text, Pflichtfeld.
+erfahrungstyp: Auswahlfeld: Beobachtung, Erfahrung, Annahme, Experiment, Wirkung, Bewährte Vorgehensweise.
+ursprüngliches_problem: mehrzeiliger Text.
+vorgehen: mehrzeiliger Text.
+beobachtetes_ergebnis: mehrzeiliger Text.
+erkenntnis: mehrzeiliger Text.
+belegquellen: Mehrfachbeziehung zu Quellen, Beurteilungen, Entscheidungen und Prüfergebnissen.
+gültigkeitsbedingungen: mehrzeiliger Text.
+bekannte_grenzen: mehrzeiliger Text.
+risiko_der_übertragung: Auswahlfeld: Niedrig, Mittel, Hoch, Unbekannt.
+bestätigungsstatus: Auswahlfeld: Ungeprüft, Vorläufig, Fachlich bestätigt, Wiederholt bestätigt, Widerlegt, Überholt.
+bestätigt_von: Benutzerfeld, optional.
+bestätigt_am: Datum, optional.
+gültig_ab: Datum, optional.
+gültig_bis: Datum, optional.
+wiederverwendungsstatus: Auswahlfeld: Nicht geprüft, Für Wiederverwendung verfügbar, Nur als Hinweis verwenden, Nicht mehr verwenden.
+kommentar_zur_wiederverwendung: mehrzeiliger Text, optional.
+Regeln:
+
+Eine einzelne Erfahrung darf nicht automatisch als allgemeingültige Regel behandelt werden.
+Erfahrungen müssen ihren ursprünglichen Kontext und ihre Belege behalten.
+Bei einer späteren Verwendung müssen die Gültigkeitsbedingungen und Grenzen sichtbar sein.
+Eine Erfahrung kann sich als nicht übertragbar, falsch oder veraltet erweisen.
+Die Anwendung muss eine Korrektur, Einschränkung oder Deaktivierung ermöglichen, ohne die Entstehungsgeschichte zu verlieren.
+Modul L: Wiederverwendung von Erfahrungen
+
+Zweck: Dokumentieren, ob frühere Erfahrungen bei einer späteren Anfrage tatsächlich hilfreich waren.
+
+Felder:
+
+wiederverwendung_id: eindeutige ID.
+erfahrung_id: Pflichtbeziehung zu einer Erfahrung.
+ziel_anfrage_id: Pflichtbeziehung zur späteren Kundenanfrage.
+abrufdatum: Datum und Uhrzeit, automatisch.
+abrufgrund: mehrzeiliger Text.
+ähnlichkeitseinschätzung: Auswahlfeld: Hoch, Mittel, Niedrig, Unklar.
+kontextunterschiede: mehrzeiliger Text.
+gültigkeit_geprüft: Ja/Nein.
+geprüft_von: Benutzerfeld.
+verwendungsergebnis: Auswahlfeld: Verwendet, Teilweise verwendet, Nicht verwendet, Als ungeeignet erkannt.
+begründung: mehrzeiliger Text.
+beobachteter_nutzen: mehrzeiliger Text.
+aufwandsersparnis_schätzung: Zahl, optional, mit Einheit Minuten oder Stunden.
+tatsächliche_aufwandsersparnis: Zahl, optional, mit Einheit Minuten oder Stunden.
+negative_folgen_oder_fehlübertragung: mehrzeiliger Text.
+bewertet_am: Datum, optional.
+Regeln:
+
+Erfahrungen dürfen nicht allein aufgrund ähnlicher Begriffe automatisch als passend gelten.
+Die Ähnlichkeit muss fachlich geprüft werden.
+Unterschiede zwischen dem früheren und dem aktuellen Fall müssen sichtbar sein.
+Auch eine begründete Nichtverwendung ist ein wertvolles Ergebnis.
+Nutzen und Aufwand sollen nach Möglichkeit anhand beobachtbarer Ergebnisse bewertet werden.
+
+4. Beziehungen zwischen den Modulen
+
+Implementiere folgende fachliche Zusammenhänge:
+
+Ein Kunde hat mehrere Kundenanfragen.
+Eine Kundenanfrage ist der zentrale Bezugspunkt für alle weiteren Arbeitsobjekte.
+Eine Kundenanfrage enthält mehrere technische Anforderungen.
+Eine Kundenanfrage besitzt mehrere Informationsquellen und Dokumente.
+Eine Anforderung kann auf mehrere Informationsquellen zurückgreifen.
+Eine Quelle kann mehrere Anforderungen belegen oder infrage stellen.
+Eine Kundenanfrage hat mehrere offene Punkte.
+Ein offener Punkt kann mehrere Anforderungen und Quellen betreffen.
+Ein offener Punkt kann mehrere Aufgaben und Kommunikationsvorgänge auslösen.
+Aufgaben werden einer verantwortlichen Person zugeordnet und können voneinander abhängen.
+Beurteilungen beziehen sich auf Anforderungen, Quellen und offene Punkte.
+Entscheidungen beziehen sich auf die zugrunde liegenden Beurteilungen und die betroffenen Anforderungen oder offenen Punkte.
+Prüfergebnisse und Freigaben beziehen sich auf die gesamte Anfrage.
+Erfahrungen entstehen aus konkreten Anfragen und verweisen auf die dort dokumentierten Sachverhalte, Entscheidungen und Ergebnisse.
+Eine Erfahrung kann in mehreren späteren Anfragen wiederverwendet werden.
+Jede Wiederverwendung verbindet die ursprüngliche Erfahrung mit der späteren Anfrage und dokumentiert das Ergebnis.
+Wichtig für die Umsetzung: Wenn KLAR keine echten Mehrfachbeziehungen unterstützt, verwende eine geeignete Zwischentabelle oder eine andere nachvollziehbare relationale Lösung. Speichere Beziehungen nicht ausschließlich als unstrukturierte Textlisten, wenn sie später filterbar, auswertbar oder navigierbar sein müssen.
+
+
+5. Arbeitsablauf und Tätigkeiten
+
+Bilde den Prozess als nachvollziehbaren Arbeitsablauf ab. Die Statuswerte der einzelnen Module dürfen sich nicht widersprechen.
+
+Schritt 1: Kundenanfrage aufnehmen
+
+Tätigkeiten:
+
+Kunden auswählen oder neu anlegen.
+Anfragebeschreibung und vorhandene Kundenanforderungen erfassen.
+Dokumente, E-Mails und sonstige Quellen zuordnen.
+Verantwortliche Person bestimmen.
+Priorität und gewünschten Klärungstermin festlegen.
+Entscheidungen:
+
+Ist die Anfrage grundsätzlich verständlich?
+Ist der Umfang für die technische Auftragsklärung geeignet?
+Wer übernimmt die Bearbeitung?
+Ergebnis: Die Anfrage ist erfasst und einer verantwortlichen Person zugeordnet.
+
+Schritt 2: Informationen prüfen
+
+Tätigkeiten:
+
+Vorhandene Quellen sichten.
+Technische Anforderungen identifizieren.
+Informationen den jeweiligen Anforderungen zuordnen.
+Fehlende Angaben, Widersprüche und unklare Aussagen erkennen.
+Herkunft und Aktualität der Informationen prüfen.
+Entscheidungen:
+
+Ist die Information ausreichend belegt?
+Sind zwei Angaben widersprüchlich?
+Ist eine Quelle aktuell und maßgeblich?
+Welche Informationen müssen nachgefordert oder geprüft werden?
+Ergebnis: Anforderungen und Informationsstand sind strukturiert; Klärungsbedarf ist sichtbar.
+
+Schritt 3: Offene Punkte und Risiken bewerten
+
+Tätigkeiten:
+
+Für jeden relevanten Klärungsbedarf einen offenen Punkt anlegen.
+Auswirkungen auf Funktion, Qualität, Sicherheit, Kosten, Termin und Herstellbarkeit einschätzen.
+Priorität festlegen.
+Zuständigkeit bestimmen.
+Erforderliche Prüfungen und Rückfragen ableiten.
+Entscheidungen:
+
+Welche Punkte blockieren die technische Klärung?
+Welche Punkte sind kritisch?
+Welche Punkte können parallel bearbeitet werden?
+Welche Punkte benötigen eine Fachentscheidung oder Eskalation?
+Ergebnis: Es existiert eine priorisierte und verantwortete Liste offener Punkte.
+
+Schritt 4: Fachliche Beurteilungen vorbereiten
+
+Tätigkeiten:
+
+Technische Machbarkeit untersuchen.
+Anforderungen mit vorhandenen Spezifikationen und Regeln vergleichen.
+Bei Bedarf Fachabteilungen einbeziehen.
+Annahmen und Unsicherheiten dokumentieren.
+Alternativen und Empfehlungen vorbereiten.
+Entscheidungen:
+
+Ist die Anforderung erfüllbar?
+Welche Informationen fehlen für eine belastbare Beurteilung?
+Ist eine technische Alternative erforderlich?
+Wer muss die Beurteilung bestätigen?
+Ergebnis: Fachliche Beurteilungen sind nachvollziehbar dokumentiert und zur Entscheidung vorbereitet.
+
+Schritt 5: Kommunikation organisieren
+
+Tätigkeiten:
+
+Rückfragen aus offenen Punkten ableiten.
+Fragen an denselben Empfänger bündeln.
+Empfänger anhand der Zuständigkeit bestimmen.
+Nachrichtenentwürfe erstellen.
+Versand und Antworten dokumentieren.
+Antworten den zugehörigen Fragen, Anforderungen und offenen Punkten zuordnen.
+Neue Widersprüche oder Folgefragen erkennen.
+Entscheidungen:
+
+Ist die Frage präzise und verständlich?
+Ist der Empfänger zuständig?
+Werden alle erforderlichen Informationen angefragt?
+Ist die Antwort vollständig und widerspruchsfrei?
+Muss eine neue Beurteilung oder Entscheidung erfolgen?
+Ergebnis: Die Kommunikation ist mit dem technischen Klärungsprozess verbunden und nicht nur in einer E-Mail-Historie abgelegt.
+
+Schritt 6: Entscheidungen treffen
+
+Tätigkeiten:
+
+Entscheidungsbedarf identifizieren.
+Relevante Informationen und Beurteilungen zusammenstellen.
+Alternativen und Konsequenzen darstellen.
+Entscheidungsverantwortliche Person bestimmen.
+Entscheidung, Begründung und gegebenenfalls Auflagen dokumentieren.
+Entscheidungen:
+
+Kann die Anforderung erfüllt werden?
+Ist eine Abweichung akzeptabel?
+Ist eine Alternative erforderlich?
+Ist eine Freigabe möglich?
+Muss die Anfrage zurückgestellt, eskaliert oder abgelehnt werden?
+Ergebnis: Die Entscheidungen sind autorisiert, nachvollziehbar und mit ihren Grundlagen verknüpft.
+
+Schritt 7: Technische Klärung abschließen
+
+Tätigkeiten:
+
+Vollständigkeit der Anforderungen prüfen.
+Kritische offene Punkte kontrollieren.
+Erforderliche Beurteilungen und Entscheidungen prüfen.
+Verbleibende Abweichungen und Risiken dokumentieren.
+Technischen Auftragsentwurf zusammenstellen.
+Übergabe an die nächste zuständige Stelle vorbereiten.
+Entscheidungen:
+
+Sind die Voraussetzungen für die technische Freigabe erfüllt?
+Welche Restpunkte sind noch zulässig?
+Ist die Übergabe möglich?
+Welche Einschränkungen müssen die nachfolgenden Beteiligten kennen?
+Ergebnis: Ein nachvollziehbar geprüfter technischer Auftragsentwurf mit dokumentiertem Status und gegebenenfalls ausdrücklich ausgewiesenen Restpunkten.
+
+Schritt 8: Erfahrungen sichern und wiederverwenden
+
+Tätigkeiten:
+
+Auffällige Probleme und wiederkehrende Rückfragen identifizieren.
+Relevante Entscheidungen und deren tatsächliche Ergebnisse betrachten.
+Erfahrungen mit Belegen, Kontext und Gültigkeitsbedingungen dokumentieren.
+Spätere vergleichbare Anfragen auf passende Erfahrungen prüfen.
+Übertragbarkeit bewerten und Verwendung oder Nichtverwendung dokumentieren.
+Entscheidungen:
+
+Ist die Erfahrung ausreichend belegt?
+Ist sie auf andere Produkte oder Fälle übertragbar?
+Welche Bedingungen müssen erfüllt sein?
+Ist die Erfahrung noch aktuell?
+Muss sie eingeschränkt, korrigiert oder deaktiviert werden?
+Ergebnis: Frühere Erfahrungen können bei späteren Anfragen helfen, ohne automatisch als gültige Regeln behandelt zu werden.
+
+
+6. Geschäftsregeln und Statussteuerung
+
+Implementiere die folgenden Regeln, soweit KLAR dies unterstützt.
+
+Regel 1: Keine stille Freigabe
+
+Eine Anfrage darf nicht allein durch das Ausfüllen von Feldern oder durch eine KI-Antwort freigegeben werden.
+
+Regel 2: Kritische offene Punkte blockieren
+
+Ein offener Punkt mit der Priorität „Kritisch“ verhindert den Abschluss, solange er nicht geklärt oder durch eine entsprechend berechtigte Person ausdrücklich entschieden wurde.
+
+Eine akzeptierte Abweichung muss mit Entscheidung, Begründung und gegebenenfalls Auflagen dokumentiert sein.
+
+Regel 3: Verantwortlichkeit ist Pflicht
+
+Offene Punkte, Aufgaben und erforderliche Entscheidungen müssen einer zuständigen Person oder Rolle zugeordnet werden.
+
+Regel 4: Antworten schließen Fragen nicht automatisch
+
+Eine Antwort muss geprüft werden. Erst danach wird der zugehörige offene Punkt als erledigt markiert.
+
+Regel 5: Änderungen lösen eine erneute Prüfung aus
+
+Wenn eine relevante Anforderung oder Quelle geändert wird, müssen die davon betroffenen Beurteilungen, Entscheidungen und offenen Punkte erkennbar sein.
+
+Sofern eine automatische Änderungsverfolgung nicht verfügbar ist, implementiere eine manuell bedienbare Funktion „Erneute Prüfung erforderlich“.
+
+Regel 6: Entscheidungen bleiben historisch nachvollziehbar
+
+Ersetzte Entscheidungen werden nicht gelöscht. Ihre Ersetzung und die neue Entscheidung müssen nachvollziehbar sein.
+
+Regel 7: Erfahrungen sind keine automatischen Wahrheiten
+
+Eine Erfahrung mit dem Status „Ungeprüft“, „Widerlegt“ oder „Überholt“ darf nicht als bestätigte Handlungsempfehlung dargestellt werden.
+
+Regel 8: Statusübergänge müssen nachvollziehbar sein
+
+Soweit möglich, protokolliere Statusänderungen mit Zeitpunkt, Benutzer und Begründung.
+
+
+7. Spezielle Benutzeroberflächen
+
+Erstelle neben den üblichen Eingabe- und Detailansichten die folgenden aufgabenorientierten Oberflächen.
+
+GUI 1: Arbeitsübersicht
+
+Zeige eine zentrale Übersicht mit:
+
+neu eingegangenen Anfragen,
+meinen offenen Aufgaben,
+überfälligen Aufgaben,
+kritischen offenen Punkten,
+ausstehenden Kundenantworten,
+ausstehenden internen Beurteilungen,
+offenen Entscheidungen,
+zur Freigabe vorbereiteten Anfragen.
+Filter:
+
+Verantwortlicher
+Kunde
+Priorität
+Status
+Fälligkeit
+Produkt oder Produktfamilie, sofern erfasst
+Die Übersicht soll erkennen lassen, wo die Arbeit stockt und welche nächste Tätigkeit erforderlich ist.
+
+GUI 2: Anfrage-Cockpit
+
+Zeige für eine ausgewählte Anfrage:
+
+Kunden- und Auftragsinformationen,
+aktuelle technische Anforderungen,
+Quellen und Dokumente,
+offene Punkte,
+Aufgaben und Verantwortlichkeiten,
+Kommunikationsverlauf,
+fachliche Beurteilungen,
+Entscheidungen,
+aktuellen Klärungsstatus,
+verbleibende Risiken und Freigabebedingungen.
+Die wichtigsten Informationen sollen auf einen Blick sichtbar sein.
+
+Verwende klar erkennbare Statusanzeigen und direkte Navigation zu den zugehörigen Objekten.
+
+GUI 3: Klärungsboard
+
+Stelle offene Punkte als übersichtliches Board dar, gruppiert nach Status, zum Beispiel:
+
+Neu
+In Bearbeitung
+Wartet auf Kunde
+Wartet intern
+Zur Entscheidung
+Erledigt
+Jede Karte zeigt mindestens Titel, Priorität, Verantwortlichen, Fälligkeit und betroffene Anforderung.
+
+Ermögliche Filter und eine schnelle Navigation zur vollständigen Detailansicht.
+
+GUI 4: Technischer Prüfbereich
+
+Biete eine tabellarische Übersicht der technischen Anforderungen mit:
+
+Anforderung
+Sollwert und Einheit
+Quelle
+Prüfstatus
+Beurteilung
+offener Punkt
+verantwortliche Person
+letzte Änderung
+Hebe fehlende Werte, Widersprüche, nicht bestätigte Annahmen und kritische Abweichungen hervor.
+
+Ein Klick auf eine Anforderung soll ihre Quellen, Beurteilungen und Entscheidungen zeigen.
+
+GUI 5: Rückfragen- und Kommunikationsbereich
+
+Zeige alle noch offenen Fragen, sortiert nach Empfänger und Dringlichkeit.
+
+Unterstütze:
+
+Bündelung mehrerer Fragen an einen Empfänger,
+Erstellung eines Kommunikationsentwurfs,
+Prüfung des Inhalts vor dem Versand,
+Zuordnung einer Antwort zu einer oder mehreren Fragen,
+Markierung unvollständiger oder widersprüchlicher Antworten,
+Erzeugung weiterer Klärungsaufgaben aus einer Antwort.
+Wenn kein tatsächlicher Nachrichtenversand verfügbar ist, biete einen kopierbaren oder exportierbaren Entwurf an und kennzeichne ihn als nicht versendet.
+
+GUI 6: Entscheidungsansicht
+
+Stelle für jede erforderliche Entscheidung kompakt dar:
+
+Entscheidungsfrage
+relevante Anforderungen
+verfügbare Informationen und Quellen
+fachliche Beurteilungen
+mögliche Alternativen
+Risiken und Unsicherheiten
+Empfehlung
+entscheidungsberechtigte Person
+Entscheidung und Begründung
+Kennzeichne klar, ob eine Entscheidung vorbereitet, ausstehend, getroffen oder überholt ist.
+
+GUI 7: Technischer Abschluss und Übergabe
+
+Erzeuge eine zusammenhängende Abschlussansicht mit:
+
+Zusammenfassung der Kundenanforderung,
+bestätigten technischen Anforderungen,
+relevanten Beurteilungen,
+getroffenen Entscheidungen,
+verbleibenden Abweichungen und Risiken,
+Freigabestatus,
+offenen Restpunkten,
+Übergabeempfänger und Übergabestatus.
+Diese Ansicht soll als nachvollziehbare Arbeitsgrundlage für die nächste Prozessstufe dienen. Ein PDF- oder Dateiexport ist wünschenswert, sofern KLAR dies unterstützt.
+
+GUI 8: Erfahrungssuche
+
+Ermögliche die Suche nach früheren Erfahrungen anhand von:
+
+Produkt oder Produktfamilie,
+Anforderungstyp,
+Problemstellung,
+offenen Punkten,
+technischen Merkmalen,
+früheren Entscheidungen,
+Schlagwörtern.
+Zeige zu jeder gefundenen Erfahrung:
+
+ursprünglichen Fall,
+damaligen Kontext,
+Belege,
+Erkenntnis,
+Gültigkeitsbedingungen,
+bekannte Grenzen,
+Bestätigungsstatus,
+bisherige Wiederverwendungen.
+Die Anwendung soll passende Erfahrungen vorschlagen, aber ihre Anwendbarkeit nicht automatisch als gesichert behandeln.
+
+
+8. Einsatz von KI
+
+Nutze KI dort, wo sie die Arbeit sinnvoll unterstützt und ihre Ergebnisse geprüft werden können.
+
+Geeignete Aufgaben sind:
+
+technische Informationen aus bereitgestellten Dokumenten extrahieren,
+Anforderungen strukturiert zusammenfassen,
+fehlende Angaben und mögliche Widersprüche vorschlagen,
+Rückfragen verständlich formulieren,
+relevante Informationen für Beurteilungen zusammenstellen,
+Alternativen und mögliche Risiken aufzeigen,
+Kommunikationsentwürfe erstellen,
+abgeschlossene Vorhaben für mögliche Erfahrungen analysieren,
+frühere Erfahrungen für eine neue Anfrage vorschlagen.
+Für KI-Ergebnisse gelten folgende Anforderungen:
+
+Kennzeichne KI-generierte Inhalte.
+Verknüpfe extrahierte Angaben möglichst mit der jeweiligen Quelle.
+Unterscheide bestätigte Informationen von Annahmen und Vorschlägen.
+Ermögliche fachliche Korrektur und Bestätigung.
+Verhindere, dass ungeprüfte KI-Ausgaben automatisch zu verbindlichen Entscheidungen oder Freigaben führen.
+Dokumentiere relevante Korrekturen und Entscheidungen, soweit die verfügbaren Funktionen dies erlauben.
+Verwende keine erfundenen technischen Daten, Normen oder Kundenangaben.
+Wenn Informationen fehlen, benenne die Lücke ausdrücklich.
+Falls eine gewünschte KI-Funktion nicht verfügbar ist, implementiere zunächst einen klaren manuellen Arbeitsschritt. Behaupte nicht, dass die Funktion automatisiert sei.
+
+
+9. Messbarkeit und Verbesserung
+
+Die Anwendung soll später ermöglichen, den Nutzen der technischen Auftragsklärung zu untersuchen.
+
+Erfasse oder unterstütze die Erfassung folgender Kennzahlen:
+
+Zeit von Anfrageeingang bis zur technischen Klärung,
+aktive Bearbeitungszeit,
+Wartezeit auf Kundenantworten,
+interne Wartezeit,
+Anzahl offener Punkte,
+Anzahl und Art von Rückfragen,
+Anzahl nachträglicher Änderungen,
+Zahl wiederkehrender Probleme,
+Zahl kritischer Abweichungen,
+Zahl erforderlicher Nacharbeiten,
+Zahl und Art genutzter früherer Erfahrungen,
+geschätzte und tatsächlich beobachtete Aufwandsersparnis.
+Trenne aktive Bearbeitungszeit von Wartezeit.
+
+Erfasse Schätzungen und gemessene Werte getrennt. Leite keine tatsächliche Einsparung allein daraus ab, dass eine KI eine Aufgabe schneller erledigt hat.
+
+Soweit möglich, stelle einfache Auswertungen nach Kunde, Produktfamilie, Zeitraum und Anfragetyp bereit.
+
+
+10. Mindestanforderungen an die erste Version
+
+Priorisiere die Umsetzung in dieser Reihenfolge:
+
+Priorität 1 – Funktionsfähiger Kern
+
+Kunden
+Kundenanfragen
+Technische Anforderungen
+Informationsquellen
+Offene Punkte
+Aufgaben
+Beurteilungen
+Entscheidungen
+Technischer Abschluss
+Anfrage-Cockpit
+Arbeitsübersicht
+Priorität 2 – Kommunikation
+
+Rückfragen und Antworten
+Zuordnung zu offenen Punkten
+Kommunikationsentwürfe
+Wiedervorlagen und Fälligkeiten
+Priorität 3 – Lernen und Wiederverwendung
+
+Erfahrungen
+Erfahrungssuche
+Dokumentation der Wiederverwendung
+Auswertung des beobachteten Nutzens
+Erstelle keine leeren Platzhalter für Funktionen, die bereits in der ersten Version benötigt werden. Wenn eine Funktion noch nicht umgesetzt werden kann, kennzeichne sie klar als offen.
+
+Vermeide doppelte Datenhaltung. Verwende Beziehungen zwischen Modulen, statt dieselben Informationen an mehreren Stellen unabhängig voneinander zu pflegen.
+
+
+11. Vorgehen bei der Erstellung
+
+Gehe bei der Umsetzung folgendermaßen vor:
+
+Prüfe die verfügbaren KLAR-Funktionen und wähle geeignete Datentypen, Beziehungen, Ansichten und Automatisierungen.
+Erstelle das Datenmodell mit den beschriebenen Modulen und Beziehungen.
+Implementiere die wichtigsten Validierungen und Statusregeln.
+Erstelle die Arbeitsübersicht, das Anfrage-Cockpit und die Ansichten für technische Prüfung und Klärungsboard.
+Implementiere den vollständigen Ablauf von der Anfrage bis zum technischen Abschluss.
+Ergänze Kommunikation und anschließend Erfahrungssicherung und Wiederverwendung.
+Prüfe die Anwendung mit einem realistischen Beispielszenario.
+Behebe erkannte Fehler und unklare Abläufe.
+Wenn die Erstellung in einem Schritt nicht möglich ist, arbeite in dieser Reihenfolge weiter und erhalte die Konsistenz des Datenmodells.
+
+Stelle nur dann Rückfragen, wenn eine nicht auflösbare fachliche Entscheidung die Implementierung wesentlich blockiert. Verwende ansonsten sinnvolle, nachvollziehbar dokumentierte Standardannahmen.
+
+
+12. Abnahmetest
+
+Prüfe die Anwendung anhand dieses Beispiels:
+
+Ein Kunde fragt ein kundenspezifisches Produkt an. Die Anfrage enthält eine Produktbeschreibung und eine Zeichnung. Eine erforderliche technische Abmessung fehlt. Zusätzlich widersprechen sich zwei Angaben in den bereitgestellten Unterlagen.
+
+Die Anwendung muss ermöglichen:
+
+Die Anfrage und ihre Quellen zu erfassen.
+Die technischen Anforderungen strukturiert anzulegen.
+Die fehlende Abmessung und den Widerspruch als offene Punkte zu erkennen oder manuell zu dokumentieren.
+Die betroffenen Anforderungen und Quellen miteinander zu verknüpfen.
+Zuständige Personen und Aufgaben festzulegen.
+Eine präzise Kundenrückfrage vorzubereiten.
+Die Antwort der Kundenanfrage und den betroffenen offenen Punkten zuzuordnen.
+Die technische Bedeutung der Antwort beurteilen zu lassen.
+Eine erforderliche Entscheidung nachvollziehbar zu dokumentieren.
+Den technischen Abschluss erst nach Erfüllung der definierten Voraussetzungen zu ermöglichen.
+Die maßgeblichen Informationen, Beurteilungen, Entscheidungen und verbleibenden Risiken in der Abschlussansicht darzustellen.
+Eine relevante Erfahrung aus dem Fall zu dokumentieren.
+Diese Erfahrung bei einer späteren vergleichbaren Anfrage zu finden, ihre Übertragbarkeit zu prüfen und die tatsächliche Verwendung oder Nichtverwendung festzuhalten.
+Teste zusätzlich mindestens folgende Fälle:
+
+Eine Antwort ist unvollständig.
+Eine Antwort widerspricht einer bestehenden Anforderung.
+Eine kritische Frage bleibt unbeantwortet.
+Eine Quelle wird durch eine neuere Version ersetzt.
+Eine Entscheidung wird durch neue Informationen überholt.
+Eine frühere Erfahrung ist für eine neue Anfrage nicht anwendbar.
+Die Anwendung muss diese Fälle nachvollziehbar behandeln. Sie darf keine unzulässige Freigabe ermöglichen und keine ungeklärten Widersprüche stillschweigend beseitigen.
+
+Abschließender Auftrag
+
+Erstelle die Anwendung jetzt auf Grundlage dieser Spezifikation.
+
+Beginne nicht mit einer bloßen Beschreibung oder einem Konzeptpapier. Implementiere die tatsächlich verfügbaren Funktionen in KLAR.
+
+Prüfe abschließend:
+
+Sind alle wesentlichen Module vorhanden?
+Sind ihre Beziehungen funktionsfähig?
+Sind die zentralen Tätigkeiten und Entscheidungen abgebildet?
+Sind Aufgaben und offene Punkte nachvollziehbar zugeordnet?
+Sind die Kommunikationsabläufe durchgängig?
+Sind kritische Statusübergänge abgesichert?
+Können technische Beurteilungen und Entscheidungen auf ihre Grundlagen zurückgeführt werden?
+Ist der Abschluss nachvollziehbar?
+Können Erfahrungen in späteren Vorhaben gefunden, geprüft und bewertet werden?
+Welche Anforderungen sind umgesetzt, welche nur teilweise umgesetzt und welche noch offen?
+Gib nach der Erstellung eine kurze Übersicht über die tatsächlich implementierten Module, Beziehungen, Benutzeroberflächen, Regeln und Automatisierungen. Nenne ausdrücklich auch Einschränkungen und noch nicht umgesetzte Anforderungen.

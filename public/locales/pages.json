@@ -1,0 +1,38 @@
+{
+  "pages": {
+    "en": {
+      "Als erledigt markieren": "Mark as done",
+      "Anfrage aufnehmen": "Record request",
+      "Anfrage übernehmen": "Accept request",
+      "Antwort eingegangen": "Response received",
+      "Arbeitsübersicht": "Work overview",
+      "Ausstehende Kundenantworten": "Pending customer responses",
+      "In Bearbeitung nehmen": "Start processing",
+      "Keine Antworten ausstehend.": "No responses pending.",
+      "Keine Entscheidung offen.": "No open decisions.",
+      "Keine neuen Anfragen.": "No new requests.",
+      "Kritische Punkte": "Critical items",
+      "Kritische Punkte brauchen eine dokumentierte Entscheidung und Begründung.": "Critical items require a documented decision and justification.",
+      "Neu eingegangene Anfragen": "Newly received requests",
+      "Neue Anfrage": "New request",
+      "Offen": "Open",
+      "Offene Entscheidungen": "Open decisions",
+      "Ohne Verantwortliche/n": "Unassigned",
+      "Starten": "Start",
+      "Vorbereitung": "Preparation",
+      "Zum Abschließen bitte zuerst Lösung/Ergebnis im Detail dokumentieren.": "To complete, please document the solution/result in detail first.",
+      "Zur Freigabe bereit": "Ready for approval",
+      "{0} Alles im Griff — keine dringenden Punkte.": "{0} All under control — no urgent items.",
+      "{0} Aufgaben überfällig, zuerst: {1} — fällig war {2} ({3}).": "{0} tasks overdue, first: {1} — was due {2} ({3}).",
+      "{0} Kritisch offen: {1}.": "{0} Critical open: {1}.",
+      "{0} Neu eingegangen: {1}.": "{0} Newly received: {1}.",
+      "{0} Wir warten auf Antwort zu {1}.": "{0} Waiting for response on {1}.",
+      "{0} Überfällig: {1}.": "{0} Overdue: {1}.",
+      "{0} — Antwort eingegangen (noch zu prüfen)": "{0} — Response received (pending review)",
+      "{0} — in Prüfung": "{0} — Under review",
+      "Überfällige Aufgabe: {0} — fällig war {1} ({2}).": "Overdue task: {0} — was due {1} ({2}).",
+      "Übernehmen": "Accept"
+    }
+  },
+  "v": 1
+}
