@@ -14,7 +14,7 @@ index.css is pre-generated with the shared design system. Do NOT edit it.
 src/config/ai-features.ts is editable — set AI_PHOTO_SCAN['Entity'] = true to enable photo scan in dialogs.
 NEVER use Bash cat/echo/heredoc for file operations — always use Read/Write/Edit tools.
 
-Generated 189 scaffold files:
+Generated 176 scaffold files:
   - src/App.tsx
   - src/i18n/index.ts
   - src/i18n/common.ts
@@ -24,7 +24,6 @@ Generated 189 scaffold files:
   - src/types/la-widgets.d.ts
   - src/components/PageShell.tsx
   - src/components/ActionsSidebar.tsx
-  - src/pages/DashboardOverview.tsx
   - src/pages/DashboardReady.tsx
   - src/components/DashboardStates.tsx
   - src/components/ConfirmDialog.tsx
@@ -54,19 +53,6 @@ Generated 189 scaffold files:
   - src/components/DatePicker.tsx
   - .placeholder-tasks.json
   - src/config/form-enhancements/types.ts
-  - src/config/form-enhancements/Kunden.ts
-  - src/config/form-enhancements/Kundenanfragen.ts
-  - src/config/form-enhancements/TechnischerAbschluss.ts
-  - src/config/form-enhancements/Statusprotokoll.ts
-  - src/config/form-enhancements/Informationsquellen.ts
-  - src/config/form-enhancements/TechnischeAnforderungen.ts
-  - src/config/form-enhancements/OffenePunkte.ts
-  - src/config/form-enhancements/Aufgaben.ts
-  - src/config/form-enhancements/Beurteilungen.ts
-  - src/config/form-enhancements/RueckfragenUndKommunikation.ts
-  - src/config/form-enhancements/Entscheidungen.ts
-  - src/config/form-enhancements/Erfahrungen.ts
-  - src/config/form-enhancements/WiederverwendungVonErfahrungen.ts
   - scripts/parse-formulas.mjs
   - scripts/apply-placeholders.mjs
   - src/config/intents.ts
@@ -89,6 +75,7 @@ Generated 189 scaffold files:
   - src/components/blocks/Field.tsx
   - src/components/blocks/Bound.tsx
   - src/components/blocks/InlineCreate.tsx
+  - src/components/blocks/FileField.tsx
   - src/lib/journey/policy.ts
   - src/lib/journey/usePolicy.ts
   - src/lib/journey/intentPolicy.ts
@@ -102,6 +89,7 @@ Generated 189 scaffold files:
   - src/lib/journey/fields.ts
   - src/lib/journey/recordLabels.ts
   - src/lib/journey/flowLinks.ts
+  - src/lib/journey/upload.ts
   - src/lib/journey/useOccupancy.ts
   - src/lib/journey/useRecordCount.ts
   - src/lib/journey/useRecordSearch.ts
@@ -132,7 +120,6 @@ Generated 189 scaffold files:
   - src/lib/ai.ts
   - src/components/VersionCheck.tsx
   - src/components/AttachmentsSection.tsx
-  - src/config/ai-features.ts
   - src/lib/formatters.ts
   - src/lib/polish.ts
   - src/hooks/useDashboardData.ts

@@ -1,8 +1,8 @@
 /**
  * useAnfrageAufnehmenFlow — the plumbing of the flow « Anfrage aufnehmen », generated from the plan.
  *
- * Writes `kundenanfragen`: asks `kunde`, `eingangskanal`, `kundenreferenz`, `produktfamilie`, `produktvariante`, `gewuenschte_menge`, `gewuenschter_liefertermin`, `anfragebeschreibung`, `urspruengliche_kundenanforderungen`, `prioritaet`, `verantwortlicher_vorname`, `verantwortlicher_nachname`, `zieltermin_klaerung`; sets `eingangsdatum`, `status`, `vollstaendigkeit`, `klaeraufwand` itself.
-Writes `informationsquellen` (only when the person fills it): asks `quellentyp`, `titel`, `datei`, `referenz_url`, `urheber`, `quellendatum`; sets `eingangszeitpunkt`, `quellenstatus`, `extraktionsstatus` itself; links `anfrage` ← the created `kundenanfragen`.
+ * Writes `kundenanfragen`: asks `kunde`, `prioritaet`, `eingangskanal`, `kundenreferenz`, `produktfamilie`, `produktvariante`, `gewuenschte_menge`, `anfragebeschreibung`, `zieltermin_klaerung`, `verantwortlicher_vorname`, `gewuenschter_liefertermin`, `verantwortlicher_nachname`, `urspruengliche_kundenanforderungen`; sets `status`, `klaeraufwand`, `eingangsdatum`, `vollstaendigkeit` itself.
+Writes `informationsquellen` (only when the person fills it): asks `datei`, `titel`, `urheber`, `quellentyp`, `quellendatum`, `referenz_url`; sets `quellenstatus`, `eingangszeitpunkt`, `extraktionsstatus` itself; links `anfrage` ← the created `kundenanfragen`.
  * The hook OWNS: the form(s) with exactly these fields and the plan's required
  * ingredients, one record search per picked field (columns and filter from
  * the plan), and the submit plan with its fixed and derived values. A page
@@ -17,29 +17,29 @@ Writes `informationsquellen` (only when the person fills it): asks `quellentyp`,
  *   messages  the sentence for an empty required field, per field
  *
  *   const flow = useAnfrageAufnehmenFlow({
- *     steps: { kunde: 1, eingangskanal: 2, kundenreferenz: 2, produktfamilie: 2, produktvariante: 2, gewuenschte_menge: 2, gewuenschter_liefertermin: 2, anfragebeschreibung: 2, urspruengliche_kundenanforderungen: 2, prioritaet: 2, verantwortlicher_vorname: 2, verantwortlicher_nachname: 2, zieltermin_klaerung: 2, quellentyp: 2, titel: 2, datei: 2, referenz_url: 2, urheber: 2, quellendatum: 2 },
+ *     steps: { kunde: 1, prioritaet: 2, eingangskanal: 2, kundenreferenz: 2, produktfamilie: 2, produktvariante: 2, gewuenschte_menge: 2, anfragebeschreibung: 2, zieltermin_klaerung: 2, verantwortlicher_vorname: 2, gewuenschter_liefertermin: 2, verantwortlicher_nachname: 2, urspruengliche_kundenanforderungen: 2, datei: 2, titel: 2, urheber: 2, quellentyp: 2, quellendatum: 2, referenz_url: 2 },
  *     items: { kunde: r => ({ id: r.id, title: fieldText(r, 'firmenname') }) },
  *   });
  *   <IntentWizardShell forms={flow.forms} draftKey={flow.draftKey} …>
  *     <EntitySelectStep {...flow.picks.kunde.select} {...flow.pick('kunde')} />
+ *     <Bound form={flow.forms.kundenanfragen} name="prioritaet" />
  *     <Bound form={flow.forms.kundenanfragen} name="eingangskanal" />
  *     <Bound form={flow.forms.kundenanfragen} name="kundenreferenz" />
  *     <Bound form={flow.forms.kundenanfragen} name="produktfamilie" />
  *     <Bound form={flow.forms.kundenanfragen} name="produktvariante" />
  *     <Bound form={flow.forms.kundenanfragen} name="gewuenschte_menge" />
- *     <Bound form={flow.forms.kundenanfragen} name="gewuenschter_liefertermin" />
  *     <Bound form={flow.forms.kundenanfragen} name="anfragebeschreibung" />
- *     <Bound form={flow.forms.kundenanfragen} name="urspruengliche_kundenanforderungen" />
- *     <Bound form={flow.forms.kundenanfragen} name="prioritaet" />
- *     <Bound form={flow.forms.kundenanfragen} name="verantwortlicher_vorname" />
- *     <Bound form={flow.forms.kundenanfragen} name="verantwortlicher_nachname" />
  *     <Bound form={flow.forms.kundenanfragen} name="zieltermin_klaerung" />
- *     <Bound form={flow.forms.informationsquellen} name="quellentyp" />
- *     <Bound form={flow.forms.informationsquellen} name="titel" />
+ *     <Bound form={flow.forms.kundenanfragen} name="verantwortlicher_vorname" />
+ *     <Bound form={flow.forms.kundenanfragen} name="gewuenschter_liefertermin" />
+ *     <Bound form={flow.forms.kundenanfragen} name="verantwortlicher_nachname" />
+ *     <Bound form={flow.forms.kundenanfragen} name="urspruengliche_kundenanforderungen" />
  *     <Bound form={flow.forms.informationsquellen} name="datei" />
- *     <Bound form={flow.forms.informationsquellen} name="referenz_url" />
+ *     <Bound form={flow.forms.informationsquellen} name="titel" />
  *     <Bound form={flow.forms.informationsquellen} name="urheber" />
+ *     <Bound form={flow.forms.informationsquellen} name="quellentyp" />
  *     <Bound form={flow.forms.informationsquellen} name="quellendatum" />
+ *     <Bound form={flow.forms.informationsquellen} name="referenz_url" />
  *     <StepNav onNext={() => flow.validateStep(n)} />
  *     {!flow.submit.done && <SummaryStep forms={flow.formList} submit={flow.submit} />}
  *     {flow.submit.result && <SuccessStep result={flow.submit.result} forms={flow.formList} submit={flow.submit} />}
@@ -106,16 +106,16 @@ function hasValues(form: StepForm): boolean {
 export function useAnfrageAufnehmenFlow(options: AnfrageAufnehmenFlowOptions = {}) {
   const steps = { ...DEFAULT_STEPS, ...(options.steps ?? {}) } as Record<string, number>;
   const kundenanfragen = useStepForm('kundenanfragen', {
-    fields: ["kunde", "eingangskanal", "kundenreferenz", "produktfamilie", "produktvariante", "gewuenschte_menge", "gewuenschter_liefertermin", "anfragebeschreibung", "urspruengliche_kundenanforderungen", "prioritaet", "verantwortlicher_vorname", "verantwortlicher_nachname", "zieltermin_klaerung"],
-    steps: only(steps, ["kunde", "eingangskanal", "kundenreferenz", "produktfamilie", "produktvariante", "gewuenschte_menge", "gewuenschter_liefertermin", "anfragebeschreibung", "urspruengliche_kundenanforderungen", "prioritaet", "verantwortlicher_vorname", "verantwortlicher_nachname", "zieltermin_klaerung"]) as Record<string, number>,
-    initial: only(options.initial as FormValues | undefined, ["kunde", "eingangskanal", "kundenreferenz", "produktfamilie", "produktvariante", "gewuenschte_menge", "gewuenschter_liefertermin", "anfragebeschreibung", "urspruengliche_kundenanforderungen", "prioritaet", "verantwortlicher_vorname", "verantwortlicher_nachname", "zieltermin_klaerung"]),
-    messages: only(options.messages as Record<string, string> | undefined, ["kunde", "eingangskanal", "kundenreferenz", "produktfamilie", "produktvariante", "gewuenschte_menge", "gewuenschter_liefertermin", "anfragebeschreibung", "urspruengliche_kundenanforderungen", "prioritaet", "verantwortlicher_vorname", "verantwortlicher_nachname", "zieltermin_klaerung"]),
+    fields: ["kunde", "prioritaet", "eingangskanal", "kundenreferenz", "produktfamilie", "produktvariante", "gewuenschte_menge", "anfragebeschreibung", "zieltermin_klaerung", "verantwortlicher_vorname", "gewuenschter_liefertermin", "verantwortlicher_nachname", "urspruengliche_kundenanforderungen"],
+    steps: only(steps, ["kunde", "prioritaet", "eingangskanal", "kundenreferenz", "produktfamilie", "produktvariante", "gewuenschte_menge", "anfragebeschreibung", "zieltermin_klaerung", "verantwortlicher_vorname", "gewuenschter_liefertermin", "verantwortlicher_nachname", "urspruengliche_kundenanforderungen"]) as Record<string, number>,
+    initial: only(options.initial as FormValues | undefined, ["kunde", "prioritaet", "eingangskanal", "kundenreferenz", "produktfamilie", "produktvariante", "gewuenschte_menge", "anfragebeschreibung", "zieltermin_klaerung", "verantwortlicher_vorname", "gewuenschter_liefertermin", "verantwortlicher_nachname", "urspruengliche_kundenanforderungen"]),
+    messages: only(options.messages as Record<string, string> | undefined, ["kunde", "prioritaet", "eingangskanal", "kundenreferenz", "produktfamilie", "produktvariante", "gewuenschte_menge", "anfragebeschreibung", "zieltermin_klaerung", "verantwortlicher_vorname", "gewuenschter_liefertermin", "verantwortlicher_nachname", "urspruengliche_kundenanforderungen"]),
   });
   const informationsquellen = useStepForm('informationsquellen', {
-    fields: ["quellentyp", "titel", "datei", "referenz_url", "urheber", "quellendatum"],
-    steps: only(steps, ["quellentyp", "titel", "datei", "referenz_url", "urheber", "quellendatum"]) as Record<string, number>,
-    initial: only(options.initial as FormValues | undefined, ["quellentyp", "titel", "datei", "referenz_url", "urheber", "quellendatum"]),
-    messages: only(options.messages as Record<string, string> | undefined, ["quellentyp", "titel", "datei", "referenz_url", "urheber", "quellendatum"]),
+    fields: ["datei", "titel", "urheber", "quellentyp", "quellendatum", "referenz_url"],
+    steps: only(steps, ["datei", "titel", "urheber", "quellentyp", "quellendatum", "referenz_url"]) as Record<string, number>,
+    initial: only(options.initial as FormValues | undefined, ["datei", "titel", "urheber", "quellentyp", "quellendatum", "referenz_url"]),
+    messages: only(options.messages as Record<string, string> | undefined, ["datei", "titel", "urheber", "quellentyp", "quellendatum", "referenz_url"]),
   });
   const forms: AnfrageAufnehmenForms = { kundenanfragen, informationsquellen };
   const formList: StepForm[] = [kundenanfragen, informationsquellen];
@@ -155,14 +155,14 @@ export function useAnfrageAufnehmenFlow(options: AnfrageAufnehmenFlowOptions = {
     {
       key: 'kundenanfragen', entity: 'kundenanfragen', form: kundenanfragen, primary: true,
       values: (): FormValues => ({
-        eingangsdatum: policyFixedValue('kundenanfragen', 'eingangsdatum') ?? todayIso(),
         status: policyFixedValue('kundenanfragen', 'status') ?? "neu",
-        vollstaendigkeit: policyFixedValue('kundenanfragen', 'vollstaendigkeit') ?? "ungeprueft",
         klaeraufwand: policyFixedValue('kundenanfragen', 'klaeraufwand') ?? "unbekannt",
+        eingangsdatum: policyFixedValue('kundenanfragen', 'eingangsdatum') ?? todayIso(),
+        vollstaendigkeit: policyFixedValue('kundenanfragen', 'vollstaendigkeit') ?? "ungeprueft",
       }),
 
       // the review shows what this step sets itself — changeable on „Deine Anwendung“, not here
-      settings: () => [setting('kundenanfragen', 'status', policyFixedValue('kundenanfragen', 'status') ?? "neu"), setting('kundenanfragen', 'vollstaendigkeit', policyFixedValue('kundenanfragen', 'vollstaendigkeit') ?? "ungeprueft"), setting('kundenanfragen', 'klaeraufwand', policyFixedValue('kundenanfragen', 'klaeraufwand') ?? "unbekannt")],
+      settings: () => [setting('kundenanfragen', 'status', policyFixedValue('kundenanfragen', 'status') ?? "neu"), setting('kundenanfragen', 'klaeraufwand', policyFixedValue('kundenanfragen', 'klaeraufwand') ?? "unbekannt"), setting('kundenanfragen', 'vollstaendigkeit', policyFixedValue('kundenanfragen', 'vollstaendigkeit') ?? "ungeprueft")],
 
       // the planner's assumptions that first act here — shown once with „Passt“ / „ändern“
       notices: () => [{"assumed": "Laufende Nummer 1, 2, 3 \u2026", "id": "anfragenummer-format", "question": "Welches Format soll die Anfragenummer haben?"}],
@@ -172,8 +172,8 @@ export function useAnfrageAufnehmenFlow(options: AnfrageAufnehmenFlowOptions = {
       link: { anfrage: 'kundenanfragen' },
 
       values: (): FormValues => ({
-        eingangszeitpunkt: policyFixedValue('informationsquellen', 'eingangszeitpunkt') ?? nowIso(),
         quellenstatus: policyFixedValue('informationsquellen', 'quellenstatus') ?? "ungeprueft",
+        eingangszeitpunkt: policyFixedValue('informationsquellen', 'eingangszeitpunkt') ?? nowIso(),
         extraktionsstatus: policyFixedValue('informationsquellen', 'extraktionsstatus') ?? "nicht_verarbeitet",
       }),
 

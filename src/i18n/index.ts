@@ -44,7 +44,7 @@
  */
 import { de as dfDe } from 'date-fns/locale';
 import type { Locale as DateFnsLocale } from 'date-fns';
-import { REST_URL } from '@/lib/origin';
+import { REST_URL, restFetch } from '@/lib/origin';
 
 // Core = baked into the bundle. Locale stays an OPEN string type so overlay
 // languages added later never invalidate today's code (`string & {}` keeps
@@ -450,6 +450,8 @@ export const UI_CATALOG: Record<CoreLocale, Record<string, string>> = {
     "am_nothing": "Nichts gefunden.",
     "am_as_wish": "Als Wunsch aufschreiben",
     "am_assumed_tag": "angenommen",
+    "am_inferred_tag": "dazu gedacht",
+    "am_inferred_hint": "Stand nicht in deiner Beschreibung — Klar hat es ergänzt. „Nicht nötig“ entfernt es.",
     "am_instant_hint": "Gilt sofort.",
     "am_take": "Übernehmen",
     "am_changed": "Geändert",
@@ -660,6 +662,15 @@ export const UI_CATALOG: Record<CoreLocale, Record<string, string>> = {
     "wz_progress": "Schritt {n} von {total}",
     "wz_progress_label": "Schritt {n} von {total}: {label}",
     "wz_steps_nav": "Fortschritt",
+    "up_choose": "Datei auswählen",
+    "up_replace": "Andere Datei",
+    "up_remove": "Datei entfernen",
+    "up_reading": "Datei wird gelesen …",
+    "up_hint": "PDF, Bild, Word oder Excel, höchstens {mb} MB.",
+    "up_too_big": "Die Datei ist größer als {mb} MB.",
+    "up_bad_type": "Diese Dateiart geht hier nicht — bitte PDF, Bild, Word oder Excel.",
+    "up_empty": "Die Datei ist leer.",
+    "up_read_failed": "Die Datei ließ sich nicht lesen. Bitte noch einmal auswählen.",
     "wz_step_done": "erledigt",
     "wz_completed": "Abgeschlossen",
     "wz_answers": "Bisherige Angaben",
@@ -1209,6 +1220,8 @@ export const UI_CATALOG: Record<CoreLocale, Record<string, string>> = {
     "am_nothing": "Nothing found.",
     "am_as_wish": "Write it down as a wish",
     "am_assumed_tag": "assumed",
+    "am_inferred_tag": "added for you",
+    "am_inferred_hint": "Not in your description — Klar added it. “Not needed” removes it.",
     "am_instant_hint": "Applies at once.",
     "am_take": "Apply",
     "am_changed": "Changed",
@@ -1419,6 +1432,15 @@ export const UI_CATALOG: Record<CoreLocale, Record<string, string>> = {
     "wz_progress": "Step {n} of {total}",
     "wz_progress_label": "Step {n} of {total}: {label}",
     "wz_steps_nav": "Progress",
+    "up_choose": "Choose file",
+    "up_replace": "Other file",
+    "up_remove": "Remove file",
+    "up_reading": "Reading file …",
+    "up_hint": "PDF, image, Word or Excel, at most {mb} MB.",
+    "up_too_big": "The file is larger than {mb} MB.",
+    "up_bad_type": "This file type is not accepted here — please PDF, image, Word or Excel.",
+    "up_empty": "The file is empty.",
+    "up_read_failed": "The file could not be read. Please choose it again.",
     "wz_step_done": "done",
     "wz_completed": "Completed",
     "wz_answers": "Your answers so far",
@@ -2172,11 +2194,11 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
         },
         "lookups": {
           "erfahrungstyp": {
+            "beobachtung": "Beobachtung",
             "erfahrung": "Erfahrung",
             "annahme": "Annahme",
             "experiment": "Experiment",
             "wirkung": "Wirkung",
-            "beobachtung": "Beobachtung",
             "bewaehrte_vorgehensweise": "Bewährte Vorgehensweise"
           },
           "risiko_uebertragung": {
@@ -2267,7 +2289,7 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
         "fields": {
           "anfragenummer": "Inquiry Number",
           "kunde": "Customer",
-          "eingangsdatum": "Received Date",
+          "eingangsdatum": "Date Received",
           "eingangskanal": "Receiving Channel",
           "kundenreferenz": "Customer Reference",
           "kontakt_vorname": "Inquiry Contact First Name",
@@ -2280,8 +2302,8 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
           "anfragebeschreibung": "Inquiry Description",
           "urspruengliche_kundenanforderungen": "Original Customer Requirements (unchanged)",
           "prioritaet": "Priority",
-          "verantwortlicher_vorname": "Responsible First Name",
-          "verantwortlicher_nachname": "Responsible Last Name",
+          "verantwortlicher_vorname": "Responsible Person First Name",
+          "verantwortlicher_nachname": "Responsible Person Last Name",
           "status": "Status",
           "klaeraufwand": "Technical Clarification Effort",
           "zieltermin_klaerung": "Clarification Target Date",
@@ -2312,13 +2334,13 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
           "status": {
             "neu": "New",
             "in_pruefung": "Under Review",
-            "rueckfragen_offen": "Open Queries",
+            "rueckfragen_offen": "Queries Open",
             "fachliche_pruefung": "Technical Review",
             "entscheidungsbedarf": "Decision Required",
             "technisch_geklaert": "Technically Clarified",
             "freigegeben": "Approved",
             "abgelehnt": "Rejected",
-            "zurueckgestellt": "Postponed"
+            "zurueckgestellt": "Deferred"
           },
           "klaeraufwand": {
             "klein": "Small",
@@ -2327,10 +2349,10 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
             "unbekannt": "Still Unknown"
           },
           "vollstaendigkeit": {
-            "ungeprueft": "Unchecked",
+            "ungeprueft": "Not Reviewed",
             "unvollstaendig": "Incomplete",
             "in_klaerung": "Under Clarification",
-            "vollstaendig_geprueft": "Fully Checked"
+            "vollstaendig_geprueft": "Fully Reviewed"
           }
         }
       },
@@ -2343,8 +2365,8 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
           "geprueft_von": "Reviewed By",
           "anforderungen_geprueft": "Requirements Reviewed",
           "kritische_punkte_geklaert": "Critical Points Clarified or Explicitly Decided",
-          "entscheidungen_vorhanden": "Required Decisions Present",
-          "freigaben_vorhanden": "Required Approvals Present",
+          "entscheidungen_vorhanden": "Required Decisions Available",
+          "freigaben_vorhanden": "Required Approvals Available",
           "verbleibende_abweichungen": "Remaining Deviations",
           "verbleibende_risiken": "Remaining Risks",
           "offene_restpunkte": "Open Remaining Items",
@@ -2359,13 +2381,13 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
             "nicht_vorbereitet": "Not Prepared",
             "bereit": "Ready for Handover",
             "uebergeben": "Handed Over",
-            "zurueckgewiesen": "Rejected"
+            "zurueckgewiesen": "Returned"
           },
           "freigabestatus": {
             "nicht_freigegeben": "Not Approved",
             "freigegeben": "Approved",
             "verweigert": "Approval Denied",
-            "zurueckgestellt": "Postponed"
+            "zurueckgestellt": "Deferred"
           }
         }
       },
@@ -2378,10 +2400,10 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
           "objektbezeichnung": "Object Name",
           "alter_status": "Old Status",
           "neuer_status": "New Status",
-          "zeitpunkt": "Timestamp",
+          "zeitpunkt": "Time",
           "benutzer_vorname": "User First Name",
           "benutzer_nachname": "User Last Name",
-          "begruendung": "Reason"
+          "begruendung": "Justification"
         },
         "lookups": {
           "objekttyp": {
@@ -2403,13 +2425,13 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
         "app_id": "6ad374b43a246ff1dc577854",
         "fields": {
           "eingangszeitpunkt": "Receipt",
-          "versionskennung": "Version ID",
+          "versionskennung": "Version Identifier",
           "quellenstatus": "Source Status",
           "zusammenfassung": "Content Summary",
           "extraktionsstatus": "Extraction Status",
-          "pruefung_durch": "Checked By",
-          "pruefung_am": "Checked On",
-          "erneute_pruefung": "Re-review of affected objects required",
+          "pruefung_durch": "Reviewed By",
+          "pruefung_am": "Reviewed On",
+          "erneute_pruefung": "Re-review of Affected Objects Required",
           "bemerkung": "Note",
           "ersetzt_quelle": "Supersedes Source",
           "anfrage": "Inquiry",
@@ -2417,14 +2439,14 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
           "titel": "Title",
           "datei": "File",
           "referenz_url": "Web Address or Reference",
-          "urheber": "Sender or Author",
+          "urheber": "Sender or Originator",
           "quellendatum": "Source Date"
         },
         "lookups": {
           "quellenstatus": {
             "aktuell": "Current",
             "ersetzt": "Superseded",
-            "ungeprueft": "Unchecked",
+            "ungeprueft": "Not Reviewed",
             "strittig": "Disputed",
             "ungueltig": "Invalid"
           },
@@ -2432,7 +2454,7 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
             "nicht_verarbeitet": "Not Processed",
             "in_bearbeitung": "In Progress",
             "extrahiert": "Extracted",
-            "manuell_geprueft": "Manually Checked",
+            "manuell_geprueft": "Manually Reviewed",
             "fehler": "Error"
           },
           "quellentyp": {
@@ -2466,9 +2488,9 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
           "max_wert": "Maximum Value",
           "ist_pflichtanforderung": "Mandatory Requirement",
           "pruefstatus": "Review Status",
-          "begruendung_pruefstatus": "Review Status Reason",
-          "verantwortlicher_vorname": "Responsible First Name",
-          "verantwortlicher_nachname": "Responsible Last Name",
+          "begruendung_pruefstatus": "Review Status Justification",
+          "verantwortlicher_vorname": "Responsible Person First Name",
+          "verantwortlicher_nachname": "Responsible Person Last Name",
           "gueltig_ab": "Valid From",
           "gueltig_bis": "Valid Until",
           "erneute_pruefung": "Re-review Required",
@@ -2506,12 +2528,12 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
             "zwischen": "Between"
           },
           "pruefstatus": {
-            "ungeprueft": "Unchecked",
+            "ungeprueft": "Not Reviewed",
             "zu_pruefen": "To Be Reviewed",
             "bestaetigt": "Confirmed",
             "unklar": "Unclear",
             "widerspruechlich": "Contradictory",
-            "nicht_erfuellt": "Not Fulfilled",
+            "nicht_erfuellt": "Not Met",
             "nicht_anwendbar": "Not Applicable"
           }
         }
@@ -2529,13 +2551,13 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
           "prioritaet": "Priority",
           "auswirkung": "Impact",
           "zustaendige_rolle": "Responsible Role",
-          "verantwortlicher_vorname": "Responsible First Name",
-          "verantwortlicher_nachname": "Responsible Last Name",
+          "verantwortlicher_vorname": "Responsible Person First Name",
+          "verantwortlicher_nachname": "Responsible Person Last Name",
           "faellig_am": "Due On",
           "status": "Status",
-          "erledigungskriterium": "Resolution Criterion",
+          "erledigungskriterium": "Completion Criterion",
           "loesung_oder_ergebnis": "Solution or Result",
-          "antwort_geprueft": "Received response was technically reviewed",
+          "antwort_geprueft": "Received Response Was Technically Reviewed",
           "abgeschlossen_am": "Completed On",
           "abschluss_durch": "Completed By",
           "erneute_pruefung": "Re-review Required"
@@ -2589,8 +2611,8 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
           "titel": "Title",
           "beschreibung": "Description and Expected Result",
           "aufgabentyp": "Task Type",
-          "verantwortlicher_vorname": "Responsible First Name",
-          "verantwortlicher_nachname": "Responsible Last Name",
+          "verantwortlicher_vorname": "Responsible Person First Name",
+          "verantwortlicher_nachname": "Responsible Person Last Name",
           "mitwirkende": "Contributors",
           "prioritaet": "Priority",
           "status": "Status",
@@ -2641,17 +2663,17 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
           "beurteilungsgegenstand": "Assessment Subject",
           "beurteilungsart": "Assessment Type",
           "einschaetzung": "Evaluation",
-          "fachliche_begruendung": "Technical Rationale",
+          "fachliche_begruendung": "Technical Justification",
           "annahmen": "Assumptions",
           "unsicherheiten": "Uncertainties",
           "alternativen": "Alternatives",
           "empfehlung": "Recommendation",
-          "ist_ki_vorschlag": "Content is an AI suggestion",
+          "ist_ki_vorschlag": "Content is an AI Suggestion",
           "erstellt_von": "Created By",
           "erstellt_am": "Created On",
           "pruefstatus": "Review Status",
           "geprueft_von": "Reviewed By",
-          "geprueft_am": "Checked On",
+          "geprueft_am": "Reviewed On",
           "erneute_pruefung": "Re-review Required"
         },
         "lookups": {
@@ -2677,7 +2699,7 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
             "entwurf": "Draft",
             "fachlich_geprueft": "Technically Reviewed",
             "bestaetigt": "Confirmed",
-            "ueberholt": "Obsolete"
+            "ueberholt": "Outdated"
           }
         }
       },
@@ -2697,17 +2719,17 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
           "inhalt": "Content (drafts are not sent)",
           "versandstatus": "Sending Status",
           "versanddatum": "Actually Sent On",
-          "antwort_erwartet_bis": "Reply Expected By",
-          "antwort_erhalten_am": "Reply Received On",
-          "antwortstatus": "Reply Status",
-          "folgeaufgabe_noetig": "Follow-up task or new assessment needed",
+          "antwort_erwartet_bis": "Response Expected By",
+          "antwort_erhalten_am": "Response Received On",
+          "antwortstatus": "Response Status",
+          "folgeaufgabe_noetig": "Follow-up Task or New Assessment Needed",
           "notizen": "Notes"
         },
         "lookups": {
           "kommunikationstyp": {
             "kundenrueckfrage": "Customer Query",
             "interne_anfrage": "Internal Request",
-            "antwort": "Reply",
+            "antwort": "Response",
             "information": "Information",
             "eskalation": "Escalation",
             "gespraechsprotokoll": "Conversation Log"
@@ -2751,9 +2773,9 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
           "entscheidungstyp": "Decision Type",
           "alternativen": "Alternatives",
           "entscheidung": "Decision",
-          "begruendung": "Reason",
-          "verantwortlicher_vorname": "Decision Owner First Name",
-          "verantwortlicher_nachname": "Decision Owner Last Name",
+          "begruendung": "Justification",
+          "verantwortlicher_vorname": "Decision Maker First Name",
+          "verantwortlicher_nachname": "Decision Maker Last Name",
           "kompetenz_geprueft": "Decision Authority Verified",
           "entscheidungsstatus": "Decision Status",
           "entscheidungsdatum": "Decision Date",
@@ -2778,7 +2800,7 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
             "vorbereitung": "Preparation",
             "zur_entscheidung": "For Decision",
             "entschieden": "Decided",
-            "zurueckgestellt": "Postponed",
+            "zurueckgestellt": "Deferred",
             "ersetzt": "Superseded"
           }
         }
@@ -2787,12 +2809,12 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
         "name": "Experiences",
         "app_id": "6ad374b85eda691ec7e0f837",
         "fields": {
-          "belegquellen": "Evidence Sources",
-          "belegbeurteilungen": "Evidence Assessments",
-          "belegentscheidungen": "Evidence Decisions",
-          "ursprungsanfrage": "Original Inquiry",
+          "belegquellen": "Supporting Sources",
+          "belegbeurteilungen": "Supporting Assessments",
+          "belegentscheidungen": "Supporting Decisions",
+          "ursprungsanfrage": "Originating Inquiry",
           "titel": "Title",
-          "sachverhalt": "Facts",
+          "sachverhalt": "Facts of the Case",
           "erfahrungstyp": "Experience Type",
           "produktfamilie": "Product or Product Family",
           "anforderungstyp": "Requirement Type",
@@ -2801,9 +2823,9 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
           "vorgehen": "Approach",
           "beobachtetes_ergebnis": "Observed Result",
           "erkenntnis": "Insight",
-          "belegabschluss": "Evidence Review Result",
+          "belegabschluss": "Review Result Evidence",
           "gueltigkeitsbedingungen": "Validity Conditions",
-          "bekannte_grenzen": "Known Limits",
+          "bekannte_grenzen": "Known Limitations",
           "risiko_uebertragung": "Transfer Risk",
           "bestaetigungsstatus": "Confirmation Status",
           "bestaetigt_von": "Confirmed By",
@@ -2815,11 +2837,11 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
         },
         "lookups": {
           "erfahrungstyp": {
+            "beobachtung": "Observation",
             "erfahrung": "Experience",
             "annahme": "Assumption",
             "experiment": "Experiment",
             "wirkung": "Effect",
-            "beobachtung": "Observation",
             "bewaehrte_vorgehensweise": "Best Practice"
           },
           "risiko_uebertragung": {
@@ -2829,17 +2851,17 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
             "unbekannt": "Unknown"
           },
           "bestaetigungsstatus": {
-            "ungeprueft": "Unchecked",
+            "ungeprueft": "Not Reviewed",
             "vorlaeufig": "Provisional",
             "fachlich_bestaetigt": "Technically Confirmed",
             "wiederholt_bestaetigt": "Repeatedly Confirmed",
             "widerlegt": "Refuted",
-            "ueberholt": "Obsolete"
+            "ueberholt": "Outdated"
           },
           "wiederverwendungsstatus": {
             "nicht_geprueft": "Not Reviewed",
             "verfuegbar": "Available for Reuse",
-            "nur_hinweis": "Use as Hint Only",
+            "nur_hinweis": "Use as Reference Only",
             "nicht_mehr_verwenden": "Do Not Use Anymore"
           }
         }
@@ -2857,7 +2879,7 @@ export const LABELS: Record<CoreLocale, LabelBundle> = {
           "gueltigkeit_geprueft": "Validity Technically Reviewed",
           "geprueft_von": "Reviewed By",
           "verwendungsergebnis": "Usage Result",
-          "begruendung": "Reason",
+          "begruendung": "Justification",
           "beobachteter_nutzen": "Observed Benefit",
           "ersparnis_schaetzung_min": "Estimated Effort Savings (Minutes)",
           "ersparnis_tatsaechlich_min": "Actually Observed Effort Savings (Minutes)",
@@ -3061,7 +3083,7 @@ export async function syncProfileLocale(): Promise<void> {
   profileSyncDone = true;
   const before = locale;
   try {
-    const r = await fetch(`${LA_API_URL}/user`, { credentials: 'include' });
+    const r = await restFetch(`${LA_API_URL}/user`, { credentials: 'include' });
     if (!r.ok) return;
     const raw = (await r.json()) as { lang?: unknown; firstname?: unknown };
     if (typeof raw?.firstname === 'string' && raw.firstname.trim()) {
@@ -3084,7 +3106,7 @@ export async function syncProfileLocale(): Promise<void> {
 // the local switch already happened; localStorage carries it meanwhile.
 async function persistProfileLanguage(next: Locale): Promise<void> {
   try {
-    await fetch(`${LA_API_URL}/user`, {
+    await restFetch(`${LA_API_URL}/user`, {
       method: 'PATCH',
       credentials: 'include',
       headers: { 'Content-Type': 'application/json' },

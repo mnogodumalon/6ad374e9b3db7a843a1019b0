@@ -10,7 +10,7 @@
  * because a request failed.
  */
 import { useEffect, useState } from 'react';
-import { REST_URL } from '@/lib/origin';
+import { REST_URL, restFetch } from '@/lib/origin';
 import { ENTITIES, type EntityKey } from '@/lib/journey/rules';
 
 const APPGROUP_ID = '6ad374e9b3db7a843a1019b0';
@@ -36,7 +36,7 @@ export function loadRights(): Promise<Rights | null> {
   if (!cached) {
     cached = (async () => {
       try {
-        const res = await fetch(`${REST_URL}/appgroups/${APPGROUP_ID}?with=apps/permissions`, {
+        const res = await restFetch(`${REST_URL}/appgroups/${APPGROUP_ID}?with=apps/permissions`, {
           credentials: 'include', headers: { Accept: 'application/json' },
         });
         if (!res.ok) return null;

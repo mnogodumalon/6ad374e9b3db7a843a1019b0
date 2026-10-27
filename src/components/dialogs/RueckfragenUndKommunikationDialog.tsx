@@ -429,7 +429,7 @@ export function RueckfragenUndKommunikationDialog({ open, onClose, onSubmit, def
         <Label htmlFor="zugehoerige_offene_punkte">{fieldLabel('rueckfragen_und_kommunikation', 'zugehoerige_offene_punkte')}</Label>
         <MultiCombobox
           id="zugehoerige_offene_punkte"
-          placeholder="Welche offenen Punkte?"
+          placeholder=""
           items={offenePunkteListAll.map(r => ({
             id: r.record_id,
             label: String(r.fields.kurztitel ?? r.record_id),
@@ -446,7 +446,7 @@ export function RueckfragenUndKommunikationDialog({ open, onClose, onSubmit, def
         <Label htmlFor="beantwortet_nachricht">{fieldLabel('rueckfragen_und_kommunikation', 'beantwortet_nachricht')}</Label>
         <Combobox
           id="beantwortet_nachricht"
-          placeholder="Auf welche Nachricht?"
+          placeholder=""
           items={rueckfragenUndKommunikationList.map(r => ({
             id: r.record_id,
             label: String(r.fields.absender ?? r.record_id),
@@ -461,7 +461,7 @@ export function RueckfragenUndKommunikationDialog({ open, onClose, onSubmit, def
         <Label htmlFor="quelle">{fieldLabel('rueckfragen_und_kommunikation', 'quelle')}</Label>
         <Combobox
           id="quelle"
-          placeholder="Woher stammt sie?"
+          placeholder=""
           items={informationsquellenListAll.map(r => ({
             id: r.record_id,
             label: String(r.fields.titel ?? r.record_id),
@@ -478,7 +478,7 @@ export function RueckfragenUndKommunikationDialog({ open, onClose, onSubmit, def
         <Label htmlFor="anfrage">{fieldLabel('rueckfragen_und_kommunikation', 'anfrage')} <span className="text-destructive" aria-hidden="true">*</span></Label>
         <Combobox
           id="anfrage"
-          placeholder="Welche Anfrage?"
+          placeholder=""
           items={kundenanfragenListAll.map(r => ({
             id: r.record_id,
             label: String(r.fields.anfragenummer ?? r.record_id),
@@ -500,7 +500,7 @@ export function RueckfragenUndKommunikationDialog({ open, onClose, onSubmit, def
           value={lookupKey(fields.kommunikationstyp) ?? ''}
           onValueChange={v => setFields(f => ({ ...f, kommunikationstyp: v === 'none' ? undefined : v as any }))}
         >
-          <SelectTrigger id="kommunikationstyp" className="max-sm:h-11"><SelectValue placeholder="z. B. Antwort, Eskalation" /></SelectTrigger>
+          <SelectTrigger id="kommunikationstyp" className="max-sm:h-11"><SelectValue placeholder="" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="none">—</SelectItem>
             <SelectItem value="kundenrueckfrage">{lookupLabel('rueckfragen_und_kommunikation', 'kommunikationstyp', 'kundenrueckfrage') ?? 'Kundenrückfrage'}</SelectItem>
@@ -523,7 +523,7 @@ export function RueckfragenUndKommunikationDialog({ open, onClose, onSubmit, def
           value={lookupKey(fields.kanal) ?? ''}
           onValueChange={v => setFields(f => ({ ...f, kanal: v === 'none' ? undefined : v as any }))}
         >
-          <SelectTrigger id="kanal" className="max-sm:h-11"><SelectValue placeholder="z. B. E-Mail, Telefon" /></SelectTrigger>
+          <SelectTrigger id="kanal" className="max-sm:h-11"><SelectValue placeholder="" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="none">—</SelectItem>
             <SelectItem value="email">{lookupLabel('rueckfragen_und_kommunikation', 'kanal', 'email') ?? 'E-Mail'}</SelectItem>
@@ -541,7 +541,7 @@ export function RueckfragenUndKommunikationDialog({ open, onClose, onSubmit, def
         <Label htmlFor="absender">{fieldLabel('rueckfragen_und_kommunikation', 'absender')}</Label>
         <Input
           id="absender"
-          placeholder="z. B. Anna Schmidt"
+          placeholder=""
           value={fields.absender ?? ''}
           onChange={e => setFields(f => ({ ...f, absender: e.target.value }))}
         />
@@ -552,7 +552,7 @@ export function RueckfragenUndKommunikationDialog({ open, onClose, onSubmit, def
         <Label htmlFor="empfaenger">{fieldLabel('rueckfragen_und_kommunikation', 'empfaenger')}</Label>
         <Input
           id="empfaenger"
-          placeholder="z. B. Max Müller"
+          placeholder=""
           value={fields.empfaenger ?? ''}
           onChange={e => setFields(f => ({ ...f, empfaenger: e.target.value }))}
         />
@@ -563,7 +563,7 @@ export function RueckfragenUndKommunikationDialog({ open, onClose, onSubmit, def
         <Label htmlFor="betreff">{fieldLabel('rueckfragen_und_kommunikation', 'betreff')} <span className="text-destructive" aria-hidden="true">*</span></Label>
         <Input
           id="betreff"
-          placeholder="z. B. Rückfrage zur Menge"
+          placeholder=""
           value={fields.betreff ?? ''}
           onChange={e => setFields(f => ({ ...f, betreff: e.target.value }))}
           required
@@ -578,7 +578,7 @@ export function RueckfragenUndKommunikationDialog({ open, onClose, onSubmit, def
         <Label htmlFor="inhalt">{fieldLabel('rueckfragen_und_kommunikation', 'inhalt')} <span className="text-destructive" aria-hidden="true">*</span></Label>
         <Textarea
           id="inhalt"
-          placeholder="Nachrichtentext eingeben"
+          placeholder=""
           value={fields.inhalt ?? ''}
           onChange={e => setFields(f => ({ ...f, inhalt: e.target.value }))}
           rows={3}
@@ -595,7 +595,7 @@ export function RueckfragenUndKommunikationDialog({ open, onClose, onSubmit, def
           value={lookupKey(fields.versandstatus) ?? ''}
           onValueChange={v => setFields(f => ({ ...f, versandstatus: v === 'none' ? undefined : v as any }))}
         >
-          <SelectTrigger id="versandstatus" className="max-sm:h-11"><SelectValue placeholder="z. B. Entwurf, Versendet" /></SelectTrigger>
+          <SelectTrigger id="versandstatus" className="max-sm:h-11"><SelectValue placeholder="" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="none">—</SelectItem>
             <SelectItem value="entwurf">{lookupLabel('rueckfragen_und_kommunikation', 'versandstatus', 'entwurf') ?? 'Entwurf'}</SelectItem>
@@ -616,7 +616,7 @@ export function RueckfragenUndKommunikationDialog({ open, onClose, onSubmit, def
         <Label htmlFor="versanddatum">{fieldLabel('rueckfragen_und_kommunikation', 'versanddatum')}</Label>
         <DatePicker
           id="versanddatum"
-          placeholder="Wann wurde sie versendet?"
+          placeholder=""
           mode="datetime"
           value={fields.versanddatum ?? null}
           onChange={v => setFields(f => ({ ...f, versanddatum: v ?? undefined }))}
@@ -628,7 +628,7 @@ export function RueckfragenUndKommunikationDialog({ open, onClose, onSubmit, def
         <Label htmlFor="antwort_erwartet_bis">{fieldLabel('rueckfragen_und_kommunikation', 'antwort_erwartet_bis')}</Label>
         <DatePicker
           id="antwort_erwartet_bis"
-          placeholder="Bis wann erwartet?"
+          placeholder=""
           mode="date"
           value={fields.antwort_erwartet_bis ?? null}
           onChange={v => setFields(f => ({ ...f, antwort_erwartet_bis: v ?? undefined }))}
@@ -640,7 +640,7 @@ export function RueckfragenUndKommunikationDialog({ open, onClose, onSubmit, def
         <Label htmlFor="antwort_erhalten_am">{fieldLabel('rueckfragen_und_kommunikation', 'antwort_erhalten_am')}</Label>
         <DatePicker
           id="antwort_erhalten_am"
-          placeholder="Wann kam die Antwort?"
+          placeholder=""
           mode="datetime"
           value={fields.antwort_erhalten_am ?? null}
           onChange={v => setFields(f => ({ ...f, antwort_erhalten_am: v ?? undefined }))}
@@ -737,7 +737,7 @@ export function RueckfragenUndKommunikationDialog({ open, onClose, onSubmit, def
         <Label htmlFor="notizen">{fieldLabel('rueckfragen_und_kommunikation', 'notizen')}</Label>
         <Textarea
           id="notizen"
-          placeholder="Weitere Hinweise"
+          placeholder=""
           value={fields.notizen ?? ''}
           onChange={e => setFields(f => ({ ...f, notizen: e.target.value }))}
           rows={3}

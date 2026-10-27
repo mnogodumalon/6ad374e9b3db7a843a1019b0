@@ -391,7 +391,7 @@ export function TechnischeAnforderungenDialog({ open, onClose, onSubmit, default
         <Label htmlFor="anfrage">{fieldLabel('technische_anforderungen', 'anfrage')} <span className="text-destructive" aria-hidden="true">*</span></Label>
         <Combobox
           id="anfrage"
-          placeholder="Welche Anfrage?"
+          placeholder=""
           items={kundenanfragenListAll.map(r => ({
             id: r.record_id,
             label: String(r.fields.anfragenummer ?? r.record_id),
@@ -411,7 +411,7 @@ export function TechnischeAnforderungenDialog({ open, onClose, onSubmit, default
         <Label htmlFor="bezeichnung">{fieldLabel('technische_anforderungen', 'bezeichnung')} <span className="text-destructive" aria-hidden="true">*</span></Label>
         <Input
           id="bezeichnung"
-          placeholder="z. B. Wellendurchmesser"
+          placeholder=""
           value={fields.bezeichnung ?? ''}
           onChange={e => setFields(f => ({ ...f, bezeichnung: e.target.value }))}
           required
@@ -426,7 +426,7 @@ export function TechnischeAnforderungenDialog({ open, onClose, onSubmit, default
         <Label htmlFor="beschreibung">{fieldLabel('technische_anforderungen', 'beschreibung')} <span className="text-destructive" aria-hidden="true">*</span></Label>
         <Textarea
           id="beschreibung"
-          placeholder="Was wird gefordert?"
+          placeholder=""
           value={fields.beschreibung ?? ''}
           onChange={e => setFields(f => ({ ...f, beschreibung: e.target.value }))}
           rows={3}
@@ -443,7 +443,7 @@ export function TechnischeAnforderungenDialog({ open, onClose, onSubmit, default
           value={lookupKey(fields.anforderungstyp) ?? ''}
           onValueChange={v => setFields(f => ({ ...f, anforderungstyp: v === 'none' ? undefined : v as any }))}
         >
-          <SelectTrigger id="anforderungstyp" className="max-sm:h-11"><SelectValue placeholder="z. B. Material, Norm" /></SelectTrigger>
+          <SelectTrigger id="anforderungstyp" className="max-sm:h-11"><SelectValue placeholder="" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="none">—</SelectItem>
             <SelectItem value="abmessung">{lookupLabel('technische_anforderungen', 'anforderungstyp', 'abmessung') ?? 'Abmessung'}</SelectItem>
@@ -469,7 +469,7 @@ export function TechnischeAnforderungenDialog({ open, onClose, onSubmit, default
           value={lookupKey(fields.ursprung) ?? ''}
           onValueChange={v => setFields(f => ({ ...f, ursprung: v === 'none' ? undefined : v as any }))}
         >
-          <SelectTrigger id="ursprung" className="max-sm:h-11"><SelectValue placeholder="z. B. Kundenunterlage, Interne Vorgabe" /></SelectTrigger>
+          <SelectTrigger id="ursprung" className="max-sm:h-11"><SelectValue placeholder="" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="none">—</SelectItem>
             <SelectItem value="kundenangabe">{lookupLabel('technische_anforderungen', 'ursprung', 'kundenangabe') ?? 'Explizite Kundenangabe'}</SelectItem>
@@ -487,7 +487,7 @@ export function TechnischeAnforderungenDialog({ open, onClose, onSubmit, default
         <Label htmlFor="sollwert">{fieldLabel('technische_anforderungen', 'sollwert')}</Label>
         <Input
           id="sollwert"
-          placeholder="z. B. 25"
+          placeholder=""
           value={fields.sollwert ?? ''}
           onChange={e => setFields(f => ({ ...f, sollwert: e.target.value }))}
         />
@@ -498,7 +498,7 @@ export function TechnischeAnforderungenDialog({ open, onClose, onSubmit, default
         <Label htmlFor="einheit">{fieldLabel('technische_anforderungen', 'einheit')}</Label>
         <Input
           id="einheit"
-          placeholder="z. B. mm"
+          placeholder=""
           value={fields.einheit ?? ''}
           onChange={e => setFields(f => ({ ...f, einheit: e.target.value }))}
         />
@@ -511,7 +511,7 @@ export function TechnischeAnforderungenDialog({ open, onClose, onSubmit, default
           value={lookupKey(fields.vergleichsoperator) ?? ''}
           onValueChange={v => setFields(f => ({ ...f, vergleichsoperator: v === 'none' ? undefined : v as any }))}
         >
-          <SelectTrigger id="vergleichsoperator" className="max-sm:h-11"><SelectValue placeholder="z. B. Gleich, Zwischen" /></SelectTrigger>
+          <SelectTrigger id="vergleichsoperator" className="max-sm:h-11"><SelectValue placeholder="" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="none">—</SelectItem>
             <SelectItem value="gleich">{lookupLabel('technische_anforderungen', 'vergleichsoperator', 'gleich') ?? 'Gleich'}</SelectItem>
@@ -533,7 +533,7 @@ export function TechnischeAnforderungenDialog({ open, onClose, onSubmit, default
           inputMode="decimal"
           step="any"
           {...numberInputProps(formEnhancements, 'min_wert')}
-          placeholder="z. B. 24,9"
+          placeholder=""
           value={fields.min_wert !== undefined ? fields.min_wert : (computedValues['min_wert'] ?? '')}
           onChange={e => setFields(f => ({ ...f, min_wert: clampNumberValue(formEnhancements, 'min_wert', e.target.value) }))}
         />
@@ -548,7 +548,7 @@ export function TechnischeAnforderungenDialog({ open, onClose, onSubmit, default
           inputMode="decimal"
           step="any"
           {...numberInputProps(formEnhancements, 'max_wert')}
-          placeholder="z. B. 25,1"
+          placeholder=""
           value={fields.max_wert !== undefined ? fields.max_wert : (computedValues['max_wert'] ?? '')}
           onChange={e => setFields(f => ({ ...f, max_wert: clampNumberValue(formEnhancements, 'max_wert', e.target.value) }))}
         />
@@ -574,7 +574,7 @@ export function TechnischeAnforderungenDialog({ open, onClose, onSubmit, default
           value={lookupKey(fields.pruefstatus) ?? ''}
           onValueChange={v => setFields(f => ({ ...f, pruefstatus: v === 'none' ? undefined : v as any }))}
         >
-          <SelectTrigger id="pruefstatus" className="max-sm:h-11"><SelectValue placeholder="z. B. Ungeprüft, Bestätigt" /></SelectTrigger>
+          <SelectTrigger id="pruefstatus" className="max-sm:h-11"><SelectValue placeholder="" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="none">—</SelectItem>
             <SelectItem value="ungeprueft">{lookupLabel('technische_anforderungen', 'pruefstatus', 'ungeprueft') ?? 'Ungeprüft'}</SelectItem>
@@ -596,7 +596,7 @@ export function TechnischeAnforderungenDialog({ open, onClose, onSubmit, default
         <Label htmlFor="begruendung_pruefstatus">{fieldLabel('technische_anforderungen', 'begruendung_pruefstatus')}</Label>
         <Textarea
           id="begruendung_pruefstatus"
-          placeholder="Warum dieser Status?"
+          placeholder=""
           value={fields.begruendung_pruefstatus ?? ''}
           onChange={e => setFields(f => ({ ...f, begruendung_pruefstatus: e.target.value }))}
           rows={3}
@@ -608,7 +608,7 @@ export function TechnischeAnforderungenDialog({ open, onClose, onSubmit, default
         <Label htmlFor="verantwortlicher_vorname">{fieldLabel('technische_anforderungen', 'verantwortlicher_vorname')}</Label>
         <Input
           id="verantwortlicher_vorname"
-          placeholder="z. B. Anna"
+          placeholder=""
           value={fields.verantwortlicher_vorname ?? ''}
           onChange={e => setFields(f => ({ ...f, verantwortlicher_vorname: e.target.value }))}
         />
@@ -619,7 +619,7 @@ export function TechnischeAnforderungenDialog({ open, onClose, onSubmit, default
         <Label htmlFor="verantwortlicher_nachname">{fieldLabel('technische_anforderungen', 'verantwortlicher_nachname')}</Label>
         <Input
           id="verantwortlicher_nachname"
-          placeholder="z. B. Müller"
+          placeholder=""
           value={fields.verantwortlicher_nachname ?? ''}
           onChange={e => setFields(f => ({ ...f, verantwortlicher_nachname: e.target.value }))}
         />
@@ -630,7 +630,7 @@ export function TechnischeAnforderungenDialog({ open, onClose, onSubmit, default
         <Label htmlFor="gueltig_ab">{fieldLabel('technische_anforderungen', 'gueltig_ab')}</Label>
         <DatePicker
           id="gueltig_ab"
-          placeholder="Ab wann gilt es?"
+          placeholder=""
           mode="date"
           value={fields.gueltig_ab ?? null}
           onChange={v => setFields(f => ({ ...f, gueltig_ab: v ?? undefined }))}
@@ -642,7 +642,7 @@ export function TechnischeAnforderungenDialog({ open, onClose, onSubmit, default
         <Label htmlFor="gueltig_bis">{fieldLabel('technische_anforderungen', 'gueltig_bis')}</Label>
         <DatePicker
           id="gueltig_bis"
-          placeholder="Bis wann gilt es?"
+          placeholder=""
           mode="date"
           value={fields.gueltig_bis ?? null}
           onChange={v => setFields(f => ({ ...f, gueltig_bis: v ?? undefined }))}
@@ -667,7 +667,7 @@ export function TechnischeAnforderungenDialog({ open, onClose, onSubmit, default
         <Label htmlFor="quellen">{fieldLabel('technische_anforderungen', 'quellen')}</Label>
         <MultiCombobox
           id="quellen"
-          placeholder="Welche Quellen?"
+          placeholder=""
           items={informationsquellenListAll.map(r => ({
             id: r.record_id,
             label: String(r.fields.titel ?? r.record_id),

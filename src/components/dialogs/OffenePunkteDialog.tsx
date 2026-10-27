@@ -422,7 +422,7 @@ export function OffenePunkteDialog({ open, onClose, onSubmit, defaultValues, rec
         <Label htmlFor="betroffene_anforderungen">{fieldLabel('offene_punkte', 'betroffene_anforderungen')}</Label>
         <MultiCombobox
           id="betroffene_anforderungen"
-          placeholder="Welche Anforderungen sind betroffen?"
+          placeholder=""
           items={technischeAnforderungenListAll.map(r => ({
             id: r.record_id,
             label: String(r.fields.bezeichnung ?? r.record_id),
@@ -439,7 +439,7 @@ export function OffenePunkteDialog({ open, onClose, onSubmit, defaultValues, rec
         <Label htmlFor="betroffene_quellen">{fieldLabel('offene_punkte', 'betroffene_quellen')}</Label>
         <MultiCombobox
           id="betroffene_quellen"
-          placeholder="Welche Quellen sind betroffen?"
+          placeholder=""
           items={informationsquellenListAll.map(r => ({
             id: r.record_id,
             label: String(r.fields.titel ?? r.record_id),
@@ -456,7 +456,7 @@ export function OffenePunkteDialog({ open, onClose, onSubmit, defaultValues, rec
         <Label htmlFor="anfrage">{fieldLabel('offene_punkte', 'anfrage')} <span className="text-destructive" aria-hidden="true">*</span></Label>
         <Combobox
           id="anfrage"
-          placeholder="Welche Anfrage?"
+          placeholder=""
           items={kundenanfragenListAll.map(r => ({
             id: r.record_id,
             label: String(r.fields.anfragenummer ?? r.record_id),
@@ -476,7 +476,7 @@ export function OffenePunkteDialog({ open, onClose, onSubmit, defaultValues, rec
         <Label htmlFor="kurztitel">{fieldLabel('offene_punkte', 'kurztitel')} <span className="text-destructive" aria-hidden="true">*</span></Label>
         <Input
           id="kurztitel"
-          placeholder="z. B. Toleranz unklar"
+          placeholder=""
           value={fields.kurztitel ?? ''}
           onChange={e => setFields(f => ({ ...f, kurztitel: e.target.value }))}
           required
@@ -491,7 +491,7 @@ export function OffenePunkteDialog({ open, onClose, onSubmit, defaultValues, rec
         <Label htmlFor="beschreibung">{fieldLabel('offene_punkte', 'beschreibung')} <span className="text-destructive" aria-hidden="true">*</span></Label>
         <Textarea
           id="beschreibung"
-          placeholder="Was ist offen und warum?"
+          placeholder=""
           value={fields.beschreibung ?? ''}
           onChange={e => setFields(f => ({ ...f, beschreibung: e.target.value }))}
           rows={3}
@@ -508,7 +508,7 @@ export function OffenePunkteDialog({ open, onClose, onSubmit, defaultValues, rec
           value={lookupKey(fields.punktetyp) ?? ''}
           onValueChange={v => setFields(f => ({ ...f, punktetyp: v === 'none' ? undefined : v as any }))}
         >
-          <SelectTrigger id="punktetyp" className="max-sm:h-11"><SelectValue placeholder="z. B. Rückfrage, Risiko" /></SelectTrigger>
+          <SelectTrigger id="punktetyp" className="max-sm:h-11"><SelectValue placeholder="" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="none">—</SelectItem>
             <SelectItem value="fehlende_information">{lookupLabel('offene_punkte', 'punktetyp', 'fehlende_information') ?? 'Fehlende Information'}</SelectItem>
@@ -593,7 +593,7 @@ export function OffenePunkteDialog({ open, onClose, onSubmit, defaultValues, rec
           value={lookupKey(fields.auswirkung) ?? ''}
           onValueChange={v => setFields(f => ({ ...f, auswirkung: v === 'none' ? undefined : v as any }))}
         >
-          <SelectTrigger id="auswirkung" className="max-sm:h-11"><SelectValue placeholder="z. B. Kosten, Termin" /></SelectTrigger>
+          <SelectTrigger id="auswirkung" className="max-sm:h-11"><SelectValue placeholder="" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="none">—</SelectItem>
             <SelectItem value="qualitaet">{lookupLabel('offene_punkte', 'auswirkung', 'qualitaet') ?? 'Qualität'}</SelectItem>
@@ -613,7 +613,7 @@ export function OffenePunkteDialog({ open, onClose, onSubmit, defaultValues, rec
         <Label htmlFor="zustaendige_rolle">{fieldLabel('offene_punkte', 'zustaendige_rolle')}</Label>
         <Input
           id="zustaendige_rolle"
-          placeholder="z. B. Konstrukteur"
+          placeholder=""
           value={fields.zustaendige_rolle ?? ''}
           onChange={e => setFields(f => ({ ...f, zustaendige_rolle: e.target.value }))}
         />
@@ -624,7 +624,7 @@ export function OffenePunkteDialog({ open, onClose, onSubmit, defaultValues, rec
         <Label htmlFor="verantwortlicher_vorname">{fieldLabel('offene_punkte', 'verantwortlicher_vorname')}</Label>
         <Input
           id="verantwortlicher_vorname"
-          placeholder="z. B. Anna"
+          placeholder=""
           value={fields.verantwortlicher_vorname ?? ''}
           onChange={e => setFields(f => ({ ...f, verantwortlicher_vorname: e.target.value }))}
         />
@@ -635,7 +635,7 @@ export function OffenePunkteDialog({ open, onClose, onSubmit, defaultValues, rec
         <Label htmlFor="verantwortlicher_nachname">{fieldLabel('offene_punkte', 'verantwortlicher_nachname')}</Label>
         <Input
           id="verantwortlicher_nachname"
-          placeholder="z. B. Meier"
+          placeholder=""
           value={fields.verantwortlicher_nachname ?? ''}
           onChange={e => setFields(f => ({ ...f, verantwortlicher_nachname: e.target.value }))}
         />
@@ -646,7 +646,7 @@ export function OffenePunkteDialog({ open, onClose, onSubmit, defaultValues, rec
         <Label htmlFor="faellig_am">{fieldLabel('offene_punkte', 'faellig_am')}</Label>
         <DatePicker
           id="faellig_am"
-          placeholder="Bis wann zu klären?"
+          placeholder=""
           mode="date"
           value={fields.faellig_am ?? null}
           onChange={v => setFields(f => ({ ...f, faellig_am: v ?? undefined }))}
@@ -660,7 +660,7 @@ export function OffenePunkteDialog({ open, onClose, onSubmit, defaultValues, rec
           value={lookupKey(fields.status) ?? ''}
           onValueChange={v => setFields(f => ({ ...f, status: v === 'none' ? undefined : v as any }))}
         >
-          <SelectTrigger id="status" className="max-sm:h-11"><SelectValue placeholder="z. B. Neu, Zugewiesen" /></SelectTrigger>
+          <SelectTrigger id="status" className="max-sm:h-11"><SelectValue placeholder="" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="none">—</SelectItem>
             <SelectItem value="neu">{lookupLabel('offene_punkte', 'status', 'neu') ?? 'Neu'}</SelectItem>
@@ -684,7 +684,7 @@ export function OffenePunkteDialog({ open, onClose, onSubmit, defaultValues, rec
         <Label htmlFor="erledigungskriterium">{fieldLabel('offene_punkte', 'erledigungskriterium')}</Label>
         <Textarea
           id="erledigungskriterium"
-          placeholder="Wann gilt der Punkt als erledigt?"
+          placeholder=""
           value={fields.erledigungskriterium ?? ''}
           onChange={e => setFields(f => ({ ...f, erledigungskriterium: e.target.value }))}
           rows={3}
@@ -696,7 +696,7 @@ export function OffenePunkteDialog({ open, onClose, onSubmit, defaultValues, rec
         <Label htmlFor="loesung_oder_ergebnis">{fieldLabel('offene_punkte', 'loesung_oder_ergebnis')}</Label>
         <Textarea
           id="loesung_oder_ergebnis"
-          placeholder="Wie wurde er gelöst?"
+          placeholder=""
           value={fields.loesung_oder_ergebnis ?? ''}
           onChange={e => setFields(f => ({ ...f, loesung_oder_ergebnis: e.target.value }))}
           rows={3}
@@ -721,7 +721,7 @@ export function OffenePunkteDialog({ open, onClose, onSubmit, defaultValues, rec
         <Label htmlFor="abgeschlossen_am">{fieldLabel('offene_punkte', 'abgeschlossen_am')}</Label>
         <DatePicker
           id="abgeschlossen_am"
-          placeholder="Wann wurde er abgeschlossen?"
+          placeholder=""
           mode="datetime"
           value={fields.abgeschlossen_am ?? null}
           onChange={v => setFields(f => ({ ...f, abgeschlossen_am: v ?? undefined }))}
@@ -733,7 +733,7 @@ export function OffenePunkteDialog({ open, onClose, onSubmit, defaultValues, rec
         <Label htmlFor="abschluss_durch">{fieldLabel('offene_punkte', 'abschluss_durch')}</Label>
         <Input
           id="abschluss_durch"
-          placeholder="z. B. Anna Meier"
+          placeholder=""
           value={fields.abschluss_durch ?? ''}
           onChange={e => setFields(f => ({ ...f, abschluss_durch: e.target.value }))}
         />

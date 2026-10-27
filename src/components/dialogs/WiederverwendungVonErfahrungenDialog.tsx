@@ -380,7 +380,7 @@ export function WiederverwendungVonErfahrungenDialog({ open, onClose, onSubmit, 
         <Label htmlFor="erfahrung">{fieldLabel('wiederverwendung_von_erfahrungen', 'erfahrung')} <span className="text-destructive" aria-hidden="true">*</span></Label>
         <Combobox
           id="erfahrung"
-          placeholder="Welche Erfahrung?"
+          placeholder=""
           items={erfahrungenListAll.map(r => ({
             id: r.record_id,
             label: String(r.fields.titel ?? r.record_id),
@@ -400,7 +400,7 @@ export function WiederverwendungVonErfahrungenDialog({ open, onClose, onSubmit, 
         <Label htmlFor="ziel_anfrage">{fieldLabel('wiederverwendung_von_erfahrungen', 'ziel_anfrage')} <span className="text-destructive" aria-hidden="true">*</span></Label>
         <Combobox
           id="ziel_anfrage"
-          placeholder="Welche Anfrage?"
+          placeholder=""
           items={kundenanfragenListAll.map(r => ({
             id: r.record_id,
             label: String(r.fields.anfragenummer ?? r.record_id),
@@ -420,7 +420,7 @@ export function WiederverwendungVonErfahrungenDialog({ open, onClose, onSubmit, 
         <Label htmlFor="abrufdatum">{fieldLabel('wiederverwendung_von_erfahrungen', 'abrufdatum')}</Label>
         <DatePicker
           id="abrufdatum"
-          placeholder="Wann abgerufen?"
+          placeholder=""
           mode="datetime"
           value={fields.abrufdatum ?? null}
           onChange={v => setFields(f => ({ ...f, abrufdatum: v ?? undefined }))}
@@ -432,7 +432,7 @@ export function WiederverwendungVonErfahrungenDialog({ open, onClose, onSubmit, 
         <Label htmlFor="abrufgrund">{fieldLabel('wiederverwendung_von_erfahrungen', 'abrufgrund')}</Label>
         <Textarea
           id="abrufgrund"
-          placeholder="Warum wurde sie abgerufen?"
+          placeholder=""
           value={fields.abrufgrund ?? ''}
           onChange={e => setFields(f => ({ ...f, abrufgrund: e.target.value }))}
           rows={3}
@@ -503,7 +503,7 @@ export function WiederverwendungVonErfahrungenDialog({ open, onClose, onSubmit, 
         <Label htmlFor="kontextunterschiede">{fieldLabel('wiederverwendung_von_erfahrungen', 'kontextunterschiede')}</Label>
         <Textarea
           id="kontextunterschiede"
-          placeholder="Was war anders?"
+          placeholder=""
           value={fields.kontextunterschiede ?? ''}
           onChange={e => setFields(f => ({ ...f, kontextunterschiede: e.target.value }))}
           rows={3}
@@ -528,7 +528,7 @@ export function WiederverwendungVonErfahrungenDialog({ open, onClose, onSubmit, 
         <Label htmlFor="geprueft_von">{fieldLabel('wiederverwendung_von_erfahrungen', 'geprueft_von')}</Label>
         <Input
           id="geprueft_von"
-          placeholder="z. B. Anna Schmidt"
+          placeholder=""
           value={fields.geprueft_von ?? ''}
           onChange={e => setFields(f => ({ ...f, geprueft_von: e.target.value }))}
         />
@@ -598,7 +598,7 @@ export function WiederverwendungVonErfahrungenDialog({ open, onClose, onSubmit, 
         <Label htmlFor="begruendung">{fieldLabel('wiederverwendung_von_erfahrungen', 'begruendung')}</Label>
         <Textarea
           id="begruendung"
-          placeholder="Warum so entschieden?"
+          placeholder=""
           value={fields.begruendung ?? ''}
           onChange={e => setFields(f => ({ ...f, begruendung: e.target.value }))}
           rows={3}
@@ -610,7 +610,7 @@ export function WiederverwendungVonErfahrungenDialog({ open, onClose, onSubmit, 
         <Label htmlFor="beobachteter_nutzen">{fieldLabel('wiederverwendung_von_erfahrungen', 'beobachteter_nutzen')}</Label>
         <Textarea
           id="beobachteter_nutzen"
-          placeholder="Was hat es gebracht?"
+          placeholder=""
           value={fields.beobachteter_nutzen ?? ''}
           onChange={e => setFields(f => ({ ...f, beobachteter_nutzen: e.target.value }))}
           rows={3}
@@ -626,7 +626,7 @@ export function WiederverwendungVonErfahrungenDialog({ open, onClose, onSubmit, 
           inputMode="decimal"
           step="any"
           {...numberInputProps(formEnhancements, 'ersparnis_schaetzung_min')}
-          placeholder="z. B. 30"
+          placeholder=""
           value={fields.ersparnis_schaetzung_min !== undefined ? fields.ersparnis_schaetzung_min : (computedValues['ersparnis_schaetzung_min'] ?? '')}
           onChange={e => setFields(f => ({ ...f, ersparnis_schaetzung_min: clampNumberValue(formEnhancements, 'ersparnis_schaetzung_min', e.target.value) }))}
         />
@@ -641,7 +641,7 @@ export function WiederverwendungVonErfahrungenDialog({ open, onClose, onSubmit, 
           inputMode="decimal"
           step="any"
           {...numberInputProps(formEnhancements, 'ersparnis_tatsaechlich_min')}
-          placeholder="z. B. 25"
+          placeholder=""
           value={fields.ersparnis_tatsaechlich_min !== undefined ? fields.ersparnis_tatsaechlich_min : (computedValues['ersparnis_tatsaechlich_min'] ?? '')}
           onChange={e => setFields(f => ({ ...f, ersparnis_tatsaechlich_min: clampNumberValue(formEnhancements, 'ersparnis_tatsaechlich_min', e.target.value) }))}
         />
@@ -652,7 +652,7 @@ export function WiederverwendungVonErfahrungenDialog({ open, onClose, onSubmit, 
         <Label htmlFor="negative_folgen">{fieldLabel('wiederverwendung_von_erfahrungen', 'negative_folgen')}</Label>
         <Textarea
           id="negative_folgen"
-          placeholder="Was ging schief?"
+          placeholder=""
           value={fields.negative_folgen ?? ''}
           onChange={e => setFields(f => ({ ...f, negative_folgen: e.target.value }))}
           rows={3}
@@ -664,7 +664,7 @@ export function WiederverwendungVonErfahrungenDialog({ open, onClose, onSubmit, 
         <Label htmlFor="bewertet_am">{fieldLabel('wiederverwendung_von_erfahrungen', 'bewertet_am')}</Label>
         <DatePicker
           id="bewertet_am"
-          placeholder="Wann bewertet?"
+          placeholder=""
           mode="date"
           value={fields.bewertet_am ?? null}
           onChange={v => setFields(f => ({ ...f, bewertet_am: v ?? undefined }))}

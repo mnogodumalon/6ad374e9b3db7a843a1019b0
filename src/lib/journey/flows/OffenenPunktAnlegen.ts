@@ -1,8 +1,8 @@
 /**
  * useOffenenPunktAnlegenFlow — the plumbing of the flow « Offenen Punkt mit Aufgabe anlegen », generated from the plan.
  *
- * Writes `offene_punkte`: asks `anfrage`, `kurztitel`, `beschreibung`, `punktetyp`, `betroffene_anforderungen`, `betroffene_quellen`, `prioritaet`, `auswirkung`, `zustaendige_rolle`, `verantwortlicher_vorname`, `verantwortlicher_nachname`, `faellig_am`, `erledigungskriterium`; sets `status` itself.
-Writes `aufgaben` (only when the person fills it): asks `anfrage`, `titel`, `beschreibung`, `aufgabentyp`, `verantwortlicher_vorname`, `verantwortlicher_nachname`, `prioritaet`, `faellig_am`; sets `status` itself; links `offener_punkt` ← the created `offene_punkte`.
+ * Writes `offene_punkte`: asks `anfrage`, `kurztitel`, `punktetyp`, `auswirkung`, `faellig_am`, `prioritaet`, `beschreibung`, `zustaendige_rolle`, `betroffene_quellen`, `erledigungskriterium`, `betroffene_anforderungen`, `verantwortlicher_vorname`, `verantwortlicher_nachname`; sets `status` itself.
+Writes `aufgaben` (only when the person fills it): asks `titel`, `anfrage`, `faellig_am`, `prioritaet`, `aufgabentyp`, `beschreibung`, `verantwortlicher_vorname`, `verantwortlicher_nachname`; sets `status` itself; links `offener_punkt` ← the created `offene_punkte`.
  * The hook OWNS: the form(s) with exactly these fields and the plan's required
  * ingredients, one record search per picked field (columns and filter from
  * the plan), and the submit plan with its fixed and derived values. A page
@@ -17,31 +17,31 @@ Writes `aufgaben` (only when the person fills it): asks `anfrage`, `titel`, `bes
  *   messages  the sentence for an empty required field, per field
  *
  *   const flow = useOffenenPunktAnlegenFlow({
- *     steps: { anfrage: 4, betroffene_anforderungen: 2, betroffene_quellen: 3, kurztitel: 5, beschreibung: 5, punktetyp: 5, prioritaet: 5, auswirkung: 5, zustaendige_rolle: 5, verantwortlicher_vorname: 5, verantwortlicher_nachname: 5, faellig_am: 5, erledigungskriterium: 5, titel: 5, aufgabentyp: 5 },
+ *     steps: { anfrage: 4, betroffene_quellen: 2, betroffene_anforderungen: 3, kurztitel: 5, punktetyp: 5, auswirkung: 5, faellig_am: 5, prioritaet: 5, beschreibung: 5, zustaendige_rolle: 5, erledigungskriterium: 5, verantwortlicher_vorname: 5, verantwortlicher_nachname: 5, titel: 5, aufgabentyp: 5 },
  *     items: { anfrage: r => ({ id: r.id, title: fieldText(r, 'anfragenummer') }) },
  *   });
  *   <IntentWizardShell forms={flow.forms} draftKey={flow.draftKey} …>
  *     <EntitySelectStep {...flow.picks.anfrage.select} {...flow.pick('anfrage')} />
- *     <EntitySelectStep {...flow.picks.betroffene_anforderungen.select} {...flow.pickMany('betroffene_anforderungen')} />
  *     <EntitySelectStep {...flow.picks.betroffene_quellen.select} {...flow.pickMany('betroffene_quellen')} />
+ *     <EntitySelectStep {...flow.picks.betroffene_anforderungen.select} {...flow.pickMany('betroffene_anforderungen')} />
  *     <EntitySelectStep {...flow.picks.aufgaben_anfrage.select} {...flow.pick('anfrage')} />
  *     <Bound form={flow.forms.offene_punkte} name="kurztitel" />
- *     <Bound form={flow.forms.offene_punkte} name="beschreibung" />
  *     <Bound form={flow.forms.offene_punkte} name="punktetyp" />
- *     <Bound form={flow.forms.offene_punkte} name="prioritaet" />
  *     <Bound form={flow.forms.offene_punkte} name="auswirkung" />
+ *     <Bound form={flow.forms.offene_punkte} name="faellig_am" />
+ *     <Bound form={flow.forms.offene_punkte} name="prioritaet" />
+ *     <Bound form={flow.forms.offene_punkte} name="beschreibung" />
  *     <Bound form={flow.forms.offene_punkte} name="zustaendige_rolle" />
+ *     <Bound form={flow.forms.offene_punkte} name="erledigungskriterium" />
  *     <Bound form={flow.forms.offene_punkte} name="verantwortlicher_vorname" />
  *     <Bound form={flow.forms.offene_punkte} name="verantwortlicher_nachname" />
- *     <Bound form={flow.forms.offene_punkte} name="faellig_am" />
- *     <Bound form={flow.forms.offene_punkte} name="erledigungskriterium" />
  *     <Bound form={flow.forms.aufgaben} name="titel" />
- *     <Bound form={flow.forms.aufgaben} name="beschreibung" />
+ *     <Bound form={flow.forms.aufgaben} name="faellig_am" />
+ *     <Bound form={flow.forms.aufgaben} name="prioritaet" />
  *     <Bound form={flow.forms.aufgaben} name="aufgabentyp" />
+ *     <Bound form={flow.forms.aufgaben} name="beschreibung" />
  *     <Bound form={flow.forms.aufgaben} name="verantwortlicher_vorname" />
  *     <Bound form={flow.forms.aufgaben} name="verantwortlicher_nachname" />
- *     <Bound form={flow.forms.aufgaben} name="prioritaet" />
- *     <Bound form={flow.forms.aufgaben} name="faellig_am" />
  *     <StepNav onNext={() => flow.validateStep(n)} />
  *     {!flow.submit.done && <SummaryStep forms={flow.formList} submit={flow.submit} />}
  *     {flow.submit.result && <SuccessStep result={flow.submit.result} forms={flow.formList} submit={flow.submit} />}
@@ -73,13 +73,13 @@ export interface OffenenPunktAnlegenFlowOptions {
   /** How a search hit reads — the card's title/subtitle/status per pick. */
   items?: {
     anfrage?: (record: JourneyRecord, ctx: RefContext) => SelectItemLike;
-    betroffene_anforderungen?: (record: JourneyRecord, ctx: RefContext) => SelectItemLike;
     betroffene_quellen?: (record: JourneyRecord, ctx: RefContext) => SelectItemLike;
+    betroffene_anforderungen?: (record: JourneyRecord, ctx: RefContext) => SelectItemLike;
     aufgaben_anfrage?: (record: JourneyRecord, ctx: RefContext) => SelectItemLike;
   };
 }
 
-const DEFAULT_STEPS: Record<string, number> = {"anfrage": 4, "aufgabentyp": 5, "auswirkung": 5, "beschreibung": 5, "betroffene_anforderungen": 2, "betroffene_quellen": 3, "erledigungskriterium": 5, "faellig_am": 5, "kurztitel": 5, "prioritaet": 5, "punktetyp": 5, "titel": 5, "verantwortlicher_nachname": 5, "verantwortlicher_vorname": 5, "zustaendige_rolle": 5};
+const DEFAULT_STEPS: Record<string, number> = {"anfrage": 4, "aufgabentyp": 5, "auswirkung": 5, "beschreibung": 5, "betroffene_anforderungen": 3, "betroffene_quellen": 2, "erledigungskriterium": 5, "faellig_am": 5, "kurztitel": 5, "prioritaet": 5, "punktetyp": 5, "titel": 5, "verantwortlicher_nachname": 5, "verantwortlicher_vorname": 5, "zustaendige_rolle": 5};
 export const OFFENENPUNKTANLEGEN_REVIEW_STEP = 6;
 
 function fromPick<T>(pick: { recordOf(id: string): JourneyRecord | undefined }, form: StepForm, field: string, read: (r: JourneyRecord) => T): T | undefined {
@@ -111,16 +111,16 @@ function hasValues(form: StepForm): boolean {
 export function useOffenenPunktAnlegenFlow(options: OffenenPunktAnlegenFlowOptions = {}) {
   const steps = { ...DEFAULT_STEPS, ...(options.steps ?? {}) } as Record<string, number>;
   const offene_punkte = useStepForm('offene_punkte', {
-    fields: ["anfrage", "kurztitel", "beschreibung", "punktetyp", "betroffene_anforderungen", "betroffene_quellen", "prioritaet", "auswirkung", "zustaendige_rolle", "verantwortlicher_vorname", "verantwortlicher_nachname", "faellig_am", "erledigungskriterium"],
-    steps: only(steps, ["anfrage", "kurztitel", "beschreibung", "punktetyp", "betroffene_anforderungen", "betroffene_quellen", "prioritaet", "auswirkung", "zustaendige_rolle", "verantwortlicher_vorname", "verantwortlicher_nachname", "faellig_am", "erledigungskriterium"]) as Record<string, number>,
-    initial: only(options.initial as FormValues | undefined, ["anfrage", "kurztitel", "beschreibung", "punktetyp", "betroffene_anforderungen", "betroffene_quellen", "prioritaet", "auswirkung", "zustaendige_rolle", "verantwortlicher_vorname", "verantwortlicher_nachname", "faellig_am", "erledigungskriterium"]),
-    messages: only(options.messages as Record<string, string> | undefined, ["anfrage", "kurztitel", "beschreibung", "punktetyp", "betroffene_anforderungen", "betroffene_quellen", "prioritaet", "auswirkung", "zustaendige_rolle", "verantwortlicher_vorname", "verantwortlicher_nachname", "faellig_am", "erledigungskriterium"]),
+    fields: ["anfrage", "kurztitel", "punktetyp", "auswirkung", "faellig_am", "prioritaet", "beschreibung", "zustaendige_rolle", "betroffene_quellen", "erledigungskriterium", "betroffene_anforderungen", "verantwortlicher_vorname", "verantwortlicher_nachname"],
+    steps: only(steps, ["anfrage", "kurztitel", "punktetyp", "auswirkung", "faellig_am", "prioritaet", "beschreibung", "zustaendige_rolle", "betroffene_quellen", "erledigungskriterium", "betroffene_anforderungen", "verantwortlicher_vorname", "verantwortlicher_nachname"]) as Record<string, number>,
+    initial: only(options.initial as FormValues | undefined, ["anfrage", "kurztitel", "punktetyp", "auswirkung", "faellig_am", "prioritaet", "beschreibung", "zustaendige_rolle", "betroffene_quellen", "erledigungskriterium", "betroffene_anforderungen", "verantwortlicher_vorname", "verantwortlicher_nachname"]),
+    messages: only(options.messages as Record<string, string> | undefined, ["anfrage", "kurztitel", "punktetyp", "auswirkung", "faellig_am", "prioritaet", "beschreibung", "zustaendige_rolle", "betroffene_quellen", "erledigungskriterium", "betroffene_anforderungen", "verantwortlicher_vorname", "verantwortlicher_nachname"]),
   });
   const aufgaben = useStepForm('aufgaben', {
-    fields: ["anfrage", "titel", "beschreibung", "aufgabentyp", "verantwortlicher_vorname", "verantwortlicher_nachname", "prioritaet", "faellig_am"],
-    steps: only(steps, ["anfrage", "titel", "beschreibung", "aufgabentyp", "verantwortlicher_vorname", "verantwortlicher_nachname", "prioritaet", "faellig_am"]) as Record<string, number>,
-    initial: only(options.initial as FormValues | undefined, ["anfrage", "titel", "beschreibung", "aufgabentyp", "verantwortlicher_vorname", "verantwortlicher_nachname", "prioritaet", "faellig_am"]),
-    messages: only(options.messages as Record<string, string> | undefined, ["anfrage", "titel", "beschreibung", "aufgabentyp", "verantwortlicher_vorname", "verantwortlicher_nachname", "prioritaet", "faellig_am"]),
+    fields: ["titel", "anfrage", "faellig_am", "prioritaet", "aufgabentyp", "beschreibung", "verantwortlicher_vorname", "verantwortlicher_nachname"],
+    steps: only(steps, ["titel", "anfrage", "faellig_am", "prioritaet", "aufgabentyp", "beschreibung", "verantwortlicher_vorname", "verantwortlicher_nachname"]) as Record<string, number>,
+    initial: only(options.initial as FormValues | undefined, ["titel", "anfrage", "faellig_am", "prioritaet", "aufgabentyp", "beschreibung", "verantwortlicher_vorname", "verantwortlicher_nachname"]),
+    messages: only(options.messages as Record<string, string> | undefined, ["titel", "anfrage", "faellig_am", "prioritaet", "aufgabentyp", "beschreibung", "verantwortlicher_vorname", "verantwortlicher_nachname"]),
   });
   const forms: OffenenPunktAnlegenForms = { offene_punkte, aufgaben };
   const formList: StepForm[] = [offene_punkte, aufgaben];
@@ -134,13 +134,13 @@ export function useOffenenPunktAnlegenFlow(options: OffenenPunktAnlegenFlowOptio
       searchFields: ["anfragenummer"] as never,
       toItem: options.items?.anfrage as never,
     })),
-    betroffene_anforderungen: useRecordSearch(servicePort, 'technische_anforderungen', withPickPolicy('betroffene_anforderungen', {
-      searchFields: ["bezeichnung"] as never,
-      toItem: options.items?.betroffene_anforderungen as never,
-    })),
     betroffene_quellen: useRecordSearch(servicePort, 'informationsquellen', withPickPolicy('betroffene_quellen', {
       searchFields: ["titel"] as never,
       toItem: options.items?.betroffene_quellen as never,
+    })),
+    betroffene_anforderungen: useRecordSearch(servicePort, 'technische_anforderungen', withPickPolicy('betroffene_anforderungen', {
+      searchFields: ["bezeichnung"] as never,
+      toItem: options.items?.betroffene_anforderungen as never,
     })),
     aufgaben_anfrage: useRecordSearch(servicePort, 'kundenanfragen', withPickPolicy('aufgaben_anfrage', {
       searchFields: ["anfragenummer"] as never,
@@ -163,8 +163,8 @@ export function useOffenenPunktAnlegenFlow(options: OffenenPunktAnlegenFlowOptio
   });
   const picks = {
     anfrage: { ...searches.anfrage, select: { ...searches.anfrage.select, create: false as boolean, hint: hintFor('anfrage', 'kundenanfragen', null as PickWhere | null) } },
-    betroffene_anforderungen: { ...searches.betroffene_anforderungen, select: { ...searches.betroffene_anforderungen.select, create: false as boolean, hint: hintFor('betroffene_anforderungen', 'technische_anforderungen', null as PickWhere | null) } },
     betroffene_quellen: { ...searches.betroffene_quellen, select: { ...searches.betroffene_quellen.select, create: false as boolean, hint: hintFor('betroffene_quellen', 'informationsquellen', null as PickWhere | null) } },
+    betroffene_anforderungen: { ...searches.betroffene_anforderungen, select: { ...searches.betroffene_anforderungen.select, create: false as boolean, hint: hintFor('betroffene_anforderungen', 'technische_anforderungen', null as PickWhere | null) } },
     aufgaben_anfrage: { ...searches.aufgaben_anfrage, select: { ...searches.aufgaben_anfrage.select, create: false as boolean, hint: hintFor('aufgaben_anfrage', 'kundenanfragen', null as PickWhere | null) } },
   };
 

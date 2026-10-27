@@ -1,7 +1,7 @@
 /**
  * useKlaerungAbschliessenFlow — the plumbing of the flow « Technische Klärung abschließen », generated from the plan.
  *
- * Writes `technischer_abschluss`: asks `anfrage`, `geprueft_von`, `anforderungen_geprueft`, `kritische_punkte_geklaert`, `entscheidungen_vorhanden`, `freigaben_vorhanden`, `verbleibende_abweichungen`, `verbleibende_risiken`, `offene_restpunkte`, `uebergabeempfaenger`, `zusammenfassung`; sets `pruefdatum`, `uebergabestatus`, `freigabestatus` itself.
+ * Writes `technischer_abschluss`: asks `anfrage`, `geprueft_von`, `zusammenfassung`, `offene_restpunkte`, `freigaben_vorhanden`, `uebergabeempfaenger`, `verbleibende_risiken`, `anforderungen_geprueft`, `entscheidungen_vorhanden`, `kritische_punkte_geklaert`, `verbleibende_abweichungen`; sets `pruefdatum`, `freigabestatus`, `uebergabestatus` itself.
 Changes `kundenanfragen`: the record to change is picked (`flow.pick('kundenanfragen')`), the form is prefilled with its values; ; sets `status`, `geklaert_am`, `vollstaendigkeit` itself.
  * The hook OWNS: the form(s) with exactly these fields and the plan's required
  * ingredients, one record search per picked field (columns and filter from
@@ -17,28 +17,28 @@ Changes `kundenanfragen`: the record to change is picked (`flow.pick('kundenanfr
  *   messages  the sentence for an empty required field, per field
  *
  *   const flow = useKlaerungAbschliessenFlow({
- *     steps: { kundenanfragen: 1, anfrage: 2, geprueft_von: 3, anforderungen_geprueft: 3, kritische_punkte_geklaert: 3, entscheidungen_vorhanden: 3, freigaben_vorhanden: 3, verbleibende_abweichungen: 3, verbleibende_risiken: 3, offene_restpunkte: 3, uebergabeempfaenger: 3, zusammenfassung: 3 },
+ *     steps: { kundenanfragen: 1, anfrage: 2, geprueft_von: 3, zusammenfassung: 3, offene_restpunkte: 3, freigaben_vorhanden: 3, uebergabeempfaenger: 3, verbleibende_risiken: 3, anforderungen_geprueft: 3, entscheidungen_vorhanden: 3, kritische_punkte_geklaert: 3, verbleibende_abweichungen: 3 },
  *     items: { anfrage: r => ({ id: r.id, title: fieldText(r, 'anfragenummer') }) },
  *   });
  *   <IntentWizardShell forms={flow.forms} draftKey={flow.draftKey} …>
  *     <EntitySelectStep {...flow.picks.anfrage.select} {...flow.pick('anfrage')} />
  *     // the record this flow changes: <EntitySelectStep {...flow.picks.kundenanfragen.select} {...flow.pick('kundenanfragen')} />
  *     <Bound form={flow.forms.technischer_abschluss} name="geprueft_von" />
- *     <Bound form={flow.forms.technischer_abschluss} name="anforderungen_geprueft" />
- *     <Bound form={flow.forms.technischer_abschluss} name="kritische_punkte_geklaert" />
- *     <Bound form={flow.forms.technischer_abschluss} name="entscheidungen_vorhanden" />
- *     <Bound form={flow.forms.technischer_abschluss} name="freigaben_vorhanden" />
- *     <Bound form={flow.forms.technischer_abschluss} name="verbleibende_abweichungen" />
- *     <Bound form={flow.forms.technischer_abschluss} name="verbleibende_risiken" />
- *     <Bound form={flow.forms.technischer_abschluss} name="offene_restpunkte" />
- *     <Bound form={flow.forms.technischer_abschluss} name="uebergabeempfaenger" />
  *     <Bound form={flow.forms.technischer_abschluss} name="zusammenfassung" />
+ *     <Bound form={flow.forms.technischer_abschluss} name="offene_restpunkte" />
+ *     <Bound form={flow.forms.technischer_abschluss} name="freigaben_vorhanden" />
+ *     <Bound form={flow.forms.technischer_abschluss} name="uebergabeempfaenger" />
+ *     <Bound form={flow.forms.technischer_abschluss} name="verbleibende_risiken" />
+ *     <Bound form={flow.forms.technischer_abschluss} name="anforderungen_geprueft" />
+ *     <Bound form={flow.forms.technischer_abschluss} name="entscheidungen_vorhanden" />
+ *     <Bound form={flow.forms.technischer_abschluss} name="kritische_punkte_geklaert" />
+ *     <Bound form={flow.forms.technischer_abschluss} name="verbleibende_abweichungen" />
  *     <StepNav onNext={() => flow.validateStep(n)} />
  *     {!flow.submit.done && <SummaryStep forms={flow.formList} submit={flow.submit} />}
  *     {flow.submit.result && <SuccessStep result={flow.submit.result} forms={flow.formList} submit={flow.submit} />}
  *   </IntentWizardShell>
  */
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   useStepForm, useJourneySubmit, useRecordSearch,
   fieldText, fieldLookup, fieldLookups, fieldNumber, fieldDate, fieldRef,
@@ -103,10 +103,10 @@ export function useKlaerungAbschliessenFlow(options: KlaerungAbschliessenFlowOpt
   const steps = { ...DEFAULT_STEPS, ...(options.steps ?? {}) } as Record<string, number>;
   const [kundenanfragenTargetId, setKundenanfragenTargetId] = useState<string | null>(null);
   const technischer_abschluss = useStepForm('technischer_abschluss', {
-    fields: ["anfrage", "geprueft_von", "anforderungen_geprueft", "kritische_punkte_geklaert", "entscheidungen_vorhanden", "freigaben_vorhanden", "verbleibende_abweichungen", "verbleibende_risiken", "offene_restpunkte", "uebergabeempfaenger", "zusammenfassung"],
-    steps: only(steps, ["anfrage", "geprueft_von", "anforderungen_geprueft", "kritische_punkte_geklaert", "entscheidungen_vorhanden", "freigaben_vorhanden", "verbleibende_abweichungen", "verbleibende_risiken", "offene_restpunkte", "uebergabeempfaenger", "zusammenfassung"]) as Record<string, number>,
-    initial: only(options.initial as FormValues | undefined, ["anfrage", "geprueft_von", "anforderungen_geprueft", "kritische_punkte_geklaert", "entscheidungen_vorhanden", "freigaben_vorhanden", "verbleibende_abweichungen", "verbleibende_risiken", "offene_restpunkte", "uebergabeempfaenger", "zusammenfassung"]),
-    messages: only(options.messages as Record<string, string> | undefined, ["anfrage", "geprueft_von", "anforderungen_geprueft", "kritische_punkte_geklaert", "entscheidungen_vorhanden", "freigaben_vorhanden", "verbleibende_abweichungen", "verbleibende_risiken", "offene_restpunkte", "uebergabeempfaenger", "zusammenfassung"]),
+    fields: ["anfrage", "geprueft_von", "zusammenfassung", "offene_restpunkte", "freigaben_vorhanden", "uebergabeempfaenger", "verbleibende_risiken", "anforderungen_geprueft", "entscheidungen_vorhanden", "kritische_punkte_geklaert", "verbleibende_abweichungen"],
+    steps: only(steps, ["anfrage", "geprueft_von", "zusammenfassung", "offene_restpunkte", "freigaben_vorhanden", "uebergabeempfaenger", "verbleibende_risiken", "anforderungen_geprueft", "entscheidungen_vorhanden", "kritische_punkte_geklaert", "verbleibende_abweichungen"]) as Record<string, number>,
+    initial: only(options.initial as FormValues | undefined, ["anfrage", "geprueft_von", "zusammenfassung", "offene_restpunkte", "freigaben_vorhanden", "uebergabeempfaenger", "verbleibende_risiken", "anforderungen_geprueft", "entscheidungen_vorhanden", "kritische_punkte_geklaert", "verbleibende_abweichungen"]),
+    messages: only(options.messages as Record<string, string> | undefined, ["anfrage", "geprueft_von", "zusammenfassung", "offene_restpunkte", "freigaben_vorhanden", "uebergabeempfaenger", "verbleibende_risiken", "anforderungen_geprueft", "entscheidungen_vorhanden", "kritische_punkte_geklaert", "verbleibende_abweichungen"]),
   });
   const kundenanfragen = useStepForm('kundenanfragen', {
     fields: [],
@@ -155,12 +155,12 @@ export function useKlaerungAbschliessenFlow(options: KlaerungAbschliessenFlowOpt
       key: 'technischer_abschluss', entity: 'technischer_abschluss', form: technischer_abschluss, primary: true,
       values: (): FormValues => ({
         pruefdatum: policyFixedValue('technischer_abschluss', 'pruefdatum') ?? nowIso(),
-        uebergabestatus: policyFixedValue('technischer_abschluss', 'uebergabestatus') ?? "bereit",
         freigabestatus: policyFixedValue('technischer_abschluss', 'freigabestatus') ?? "nicht_freigegeben",
+        uebergabestatus: policyFixedValue('technischer_abschluss', 'uebergabestatus') ?? "bereit",
       }),
 
       // the review shows what this step sets itself — changeable on „Deine Anwendung“, not here
-      settings: () => [setting('technischer_abschluss', 'uebergabestatus', policyFixedValue('technischer_abschluss', 'uebergabestatus') ?? "bereit"), setting('technischer_abschluss', 'freigabestatus', policyFixedValue('technischer_abschluss', 'freigabestatus') ?? "nicht_freigegeben")],
+      settings: () => [setting('technischer_abschluss', 'freigabestatus', policyFixedValue('technischer_abschluss', 'freigabestatus') ?? "nicht_freigegeben"), setting('technischer_abschluss', 'uebergabestatus', policyFixedValue('technischer_abschluss', 'uebergabestatus') ?? "bereit")],
     },
     {
       key: 'kundenanfragen', entity: 'kundenanfragen', form: kundenanfragen,
@@ -195,6 +195,21 @@ export function useKlaerungAbschliessenFlow(options: KlaerungAbschliessenFlowOpt
       get record(): JourneyRecord | undefined { return kundenanfragenTargetId ? picks.kundenanfragen.recordOf(kundenanfragenTargetId) : undefined; },
     },
   };
+  // Opened for one record — `#/intents/klaerung-abschliessen?record=<id>`, the dashboard's
+  // flowActionFor(): that record is the one to change. Loaded, taken into the
+  // pick and selected — when this flow may change it at all (the pick's rule).
+  const [linkedId] = useState(() => new URLSearchParams(window.location.hash.split('?')[1] ?? '').get('record'));
+  useEffect(() => {
+    if (!linkedId) return;
+    let on = true;
+    void servicePort.get('kundenanfragen', linkedId).then(rec => {
+      if (!on || !rec) return;
+      picks.kundenanfragen.adopt(rec);
+      targets.kundenanfragen.onSelect(rec.id);
+    }).catch(() => undefined);
+    return () => { on = false; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- once per link
+  }, [linkedId]);
   /** Props for a single-record pick step: {...flow.picks.x.select} {...flow.pick('x')} */
   const pick = (field: KlaerungAbschliessenFieldKey) => {
     if (field in targets) {

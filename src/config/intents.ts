@@ -43,12 +43,12 @@ export interface IntentLink {
 
 export const INTENTS: IntentLink[] = [
   // <custom:intents>
-  { path: '/intents/anfrage-aufnehmen', label: { de: 'Anfrage aufnehmen', en: 'Record inquiry' }, icon: IconInbox, description: 'Kunde wählen, Anfrage erfassen, erste Quelle ablegen, Verantwortlichen und Priorität festlegen.' },
-  { path: '/intents/anforderungen-erfassen', label: { de: 'Anforderungen erfassen', en: 'Capture requirements' }, icon: IconListCheck, description: 'Technische Anforderungen zu einer Anfrage anlegen, Quellen zuordnen, Anfrage in Prüfung setzen.' },
-  { path: '/intents/offenen-punkt-anlegen', label: { de: 'Offenen Punkt mit Aufgabe anlegen', en: 'Create open item with task' }, icon: IconAlertTriangle, description: 'Klärungsbedarf als offenen Punkt erfassen und direkt eine verantwortete Aufgabe anlegen.' },
-  { path: '/intents/rueckfrage-vorbereiten', label: { de: 'Rückfrage vorbereiten', en: 'Prepare inquiry message' }, icon: IconMessageQuestion, description: 'Aus offenen Punkten einen Nachrichtenentwurf bündeln (nicht versendet); Punkte warten danach auf den Kunden.' },
-  { path: '/intents/antwort-zuordnen', label: { de: 'Antwort zuordnen', en: 'Assign reply' }, icon: IconMessageReply, description: 'Antwort erfassen, mit Nachricht und offenen Punkten verknüpfen und als vollständig, unklar oder widersprüchlich kennzeichnen.' },
-  { path: '/intents/klaerung-abschliessen', label: { de: 'Technische Klärung abschließen', en: 'Complete technical clarification' }, icon: IconCircleCheck, description: 'Voraussetzungen prüfen, Abschluss mit Restrisiken und Übergabe dokumentieren, Anfrage auf technisch geklärt setzen. Keine automatische Freigabe.' },
+  { path: '/intents/anfrage-aufnehmen', label: { de: 'Anfrage aufnehmen', en: 'Record inquiry' }, icon: IconInbox, description: { de: 'Kunde wählen, Anfrage erfassen, erste Quelle ablegen, Verantwortlichen und Priorität festlegen.', en: 'Select customer, record inquiry, file first source, assign owner and priority.' } },
+  { path: '/intents/anforderungen-erfassen', label: { de: 'Anforderungen erfassen', en: 'Capture requirements' }, icon: IconListCheck, description: { de: 'Technische Anforderungen zu einer Anfrage anlegen, Quellen zuordnen, Anfrage in Prüfung setzen.', en: 'Create technical requirements for an inquiry, assign sources, set inquiry to under review.' } },
+  { path: '/intents/offenen-punkt-anlegen', label: { de: 'Offenen Punkt mit Aufgabe anlegen', en: 'Create open item with task' }, icon: IconAlertTriangle, description: { de: 'Klärungsbedarf als offenen Punkt erfassen und direkt eine verantwortete Aufgabe anlegen.', en: 'Record clarification need as an open item and directly create an assigned task.' } },
+  { path: '/intents/rueckfrage-vorbereiten', label: { de: 'Rückfrage vorbereiten', en: 'Prepare inquiry message' }, icon: IconMessageQuestion, description: { de: 'Aus offenen Punkten einen Nachrichtenentwurf bündeln (nicht versendet); Punkte warten danach auf den Kunden.', en: 'Bundle open items into a message draft (not sent); items then wait for the customer.' } },
+  { path: '/intents/antwort-zuordnen', label: { de: 'Antwort zuordnen', en: 'Assign reply' }, icon: IconMessageReply, description: { de: 'Antwort erfassen, mit Nachricht und offenen Punkten verknüpfen und als vollständig, unklar oder widersprüchlich kennzeichnen.', en: 'Record reply, link it to message and open items, and mark it as complete, unclear, or contradictory.' } },
+  { path: '/intents/klaerung-abschliessen', label: { de: 'Technische Klärung abschließen', en: 'Complete technical clarification' }, icon: IconCircleCheck, description: { de: 'Voraussetzungen prüfen, Abschluss mit Restrisiken und Übergabe dokumentieren, Anfrage auf technisch geklärt setzen. Keine automatische Freigabe.', en: 'Check prerequisites, document completion with residual risks and handover, set inquiry to technically clarified. No automatic approval.' } },
   // </custom:intents>
 ];
 
@@ -68,5 +68,5 @@ export const INTENTS_PENDING = false;
  * pulsing "werden erstellt …" in every deployed Phase-1 bundle forever — no
  * code path redeploys Phase 1 without the flag (live 03.09.2026).
  */
-export const INTENTS_PENDING_SINCE: string | null = '2026-10-17T13:17:06+00:00';
+export const INTENTS_PENDING_SINCE: string | null = null;
 export const PENDING_MAX_MINUTES = 30;

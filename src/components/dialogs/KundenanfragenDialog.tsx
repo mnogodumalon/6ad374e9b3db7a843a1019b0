@@ -362,7 +362,7 @@ export function KundenanfragenDialog({ open, onClose, onSubmit, defaultValues, r
         <Label htmlFor="anfragenummer">{fieldLabel('kundenanfragen', 'anfragenummer')}</Label>
         <Input
           id="anfragenummer"
-          placeholder="z. B. KA-2026-001"
+          placeholder=""
           value={fields.anfragenummer ?? ''}
           onChange={e => setFields(f => ({ ...f, anfragenummer: e.target.value }))}
         />
@@ -373,7 +373,7 @@ export function KundenanfragenDialog({ open, onClose, onSubmit, defaultValues, r
         <Label htmlFor="kunde">{fieldLabel('kundenanfragen', 'kunde')} <span className="text-destructive" aria-hidden="true">*</span></Label>
         <Combobox
           id="kunde"
-          placeholder="Welcher Kunde?"
+          placeholder=""
           items={kundenListAll.map(r => ({
             id: r.record_id,
             label: String(r.fields.kundennummer ?? r.record_id),
@@ -393,7 +393,7 @@ export function KundenanfragenDialog({ open, onClose, onSubmit, defaultValues, r
         <Label htmlFor="eingangsdatum">{fieldLabel('kundenanfragen', 'eingangsdatum')} <span className="text-destructive" aria-hidden="true">*</span></Label>
         <DatePicker
           id="eingangsdatum"
-          placeholder="Wann ging die Anfrage ein?"
+          placeholder=""
           mode="date"
           value={fields.eingangsdatum ?? null}
           onChange={v => setFields(f => ({ ...f, eingangsdatum: v ?? undefined }))}
@@ -411,7 +411,7 @@ export function KundenanfragenDialog({ open, onClose, onSubmit, defaultValues, r
           value={lookupKey(fields.eingangskanal) ?? ''}
           onValueChange={v => setFields(f => ({ ...f, eingangskanal: v === 'none' ? undefined : v as any }))}
         >
-          <SelectTrigger id="eingangskanal" className="max-sm:h-11"><SelectValue placeholder="z. B. E-Mail, Telefon" /></SelectTrigger>
+          <SelectTrigger id="eingangskanal" className="max-sm:h-11"><SelectValue placeholder="" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="none">—</SelectItem>
             <SelectItem value="email">{lookupLabel('kundenanfragen', 'eingangskanal', 'email') ?? 'E-Mail'}</SelectItem>
@@ -429,7 +429,7 @@ export function KundenanfragenDialog({ open, onClose, onSubmit, defaultValues, r
         <Label htmlFor="kundenreferenz">{fieldLabel('kundenanfragen', 'kundenreferenz')}</Label>
         <Input
           id="kundenreferenz"
-          placeholder="z. B. REF-12345"
+          placeholder=""
           value={fields.kundenreferenz ?? ''}
           onChange={e => setFields(f => ({ ...f, kundenreferenz: e.target.value }))}
         />
@@ -440,7 +440,7 @@ export function KundenanfragenDialog({ open, onClose, onSubmit, defaultValues, r
         <Label htmlFor="kontakt_vorname">{fieldLabel('kundenanfragen', 'kontakt_vorname')}</Label>
         <Input
           id="kontakt_vorname"
-          placeholder="z. B. Anna"
+          placeholder=""
           value={fields.kontakt_vorname ?? ''}
           onChange={e => setFields(f => ({ ...f, kontakt_vorname: e.target.value }))}
         />
@@ -451,7 +451,7 @@ export function KundenanfragenDialog({ open, onClose, onSubmit, defaultValues, r
         <Label htmlFor="kontakt_nachname">{fieldLabel('kundenanfragen', 'kontakt_nachname')}</Label>
         <Input
           id="kontakt_nachname"
-          placeholder="z. B. Müller"
+          placeholder=""
           value={fields.kontakt_nachname ?? ''}
           onChange={e => setFields(f => ({ ...f, kontakt_nachname: e.target.value }))}
         />
@@ -464,7 +464,7 @@ export function KundenanfragenDialog({ open, onClose, onSubmit, defaultValues, r
           id="kontakt_email"
           type="email"
           inputMode="email"
-          placeholder="z. B. anna.mueller@firma.de"
+          placeholder=""
           value={fields.kontakt_email ?? ''}
           onChange={e => setFields(f => ({ ...f, kontakt_email: e.target.value }))}
         />
@@ -475,7 +475,7 @@ export function KundenanfragenDialog({ open, onClose, onSubmit, defaultValues, r
         <Label htmlFor="produktfamilie">{fieldLabel('kundenanfragen', 'produktfamilie')}</Label>
         <Input
           id="produktfamilie"
-          placeholder="z. B. Hydraulikzylinder"
+          placeholder=""
           value={fields.produktfamilie ?? ''}
           onChange={e => setFields(f => ({ ...f, produktfamilie: e.target.value }))}
         />
@@ -486,7 +486,7 @@ export function KundenanfragenDialog({ open, onClose, onSubmit, defaultValues, r
         <Label htmlFor="produktvariante">{fieldLabel('kundenanfragen', 'produktvariante')}</Label>
         <Input
           id="produktvariante"
-          placeholder="z. B. Edelstahl, 50 mm"
+          placeholder=""
           value={fields.produktvariante ?? ''}
           onChange={e => setFields(f => ({ ...f, produktvariante: e.target.value }))}
         />
@@ -501,7 +501,7 @@ export function KundenanfragenDialog({ open, onClose, onSubmit, defaultValues, r
           inputMode="decimal"
           step="any"
           {...numberInputProps(formEnhancements, 'gewuenschte_menge')}
-          placeholder="z. B. 250"
+          placeholder=""
           value={fields.gewuenschte_menge !== undefined ? fields.gewuenschte_menge : (computedValues['gewuenschte_menge'] ?? '')}
           onChange={e => setFields(f => ({ ...f, gewuenschte_menge: clampNumberValue(formEnhancements, 'gewuenschte_menge', e.target.value) }))}
         />
@@ -512,7 +512,7 @@ export function KundenanfragenDialog({ open, onClose, onSubmit, defaultValues, r
         <Label htmlFor="gewuenschter_liefertermin">{fieldLabel('kundenanfragen', 'gewuenschter_liefertermin')}</Label>
         <DatePicker
           id="gewuenschter_liefertermin"
-          placeholder="Bis wann wird geliefert?"
+          placeholder=""
           mode="date"
           value={fields.gewuenschter_liefertermin ?? null}
           onChange={v => setFields(f => ({ ...f, gewuenschter_liefertermin: v ?? undefined }))}
@@ -524,7 +524,7 @@ export function KundenanfragenDialog({ open, onClose, onSubmit, defaultValues, r
         <Label htmlFor="anfragebeschreibung">{fieldLabel('kundenanfragen', 'anfragebeschreibung')} <span className="text-destructive" aria-hidden="true">*</span></Label>
         <Textarea
           id="anfragebeschreibung"
-          placeholder="Worum geht es in der Anfrage?"
+          placeholder=""
           value={fields.anfragebeschreibung ?? ''}
           onChange={e => setFields(f => ({ ...f, anfragebeschreibung: e.target.value }))}
           rows={3}
@@ -539,7 +539,7 @@ export function KundenanfragenDialog({ open, onClose, onSubmit, defaultValues, r
         <Label htmlFor="urspruengliche_kundenanforderungen">{fieldLabel('kundenanfragen', 'urspruengliche_kundenanforderungen')} <span className="text-destructive" aria-hidden="true">*</span></Label>
         <Textarea
           id="urspruengliche_kundenanforderungen"
-          placeholder="Anforderungen im Originalwortlaut"
+          placeholder=""
           value={fields.urspruengliche_kundenanforderungen ?? ''}
           onChange={e => setFields(f => ({ ...f, urspruengliche_kundenanforderungen: e.target.value }))}
           rows={3}
@@ -613,7 +613,7 @@ export function KundenanfragenDialog({ open, onClose, onSubmit, defaultValues, r
         <Label htmlFor="verantwortlicher_vorname">{fieldLabel('kundenanfragen', 'verantwortlicher_vorname')}</Label>
         <Input
           id="verantwortlicher_vorname"
-          placeholder="z. B. Thomas"
+          placeholder=""
           value={fields.verantwortlicher_vorname ?? ''}
           onChange={e => setFields(f => ({ ...f, verantwortlicher_vorname: e.target.value }))}
         />
@@ -624,7 +624,7 @@ export function KundenanfragenDialog({ open, onClose, onSubmit, defaultValues, r
         <Label htmlFor="verantwortlicher_nachname">{fieldLabel('kundenanfragen', 'verantwortlicher_nachname')}</Label>
         <Input
           id="verantwortlicher_nachname"
-          placeholder="z. B. Schmidt"
+          placeholder=""
           value={fields.verantwortlicher_nachname ?? ''}
           onChange={e => setFields(f => ({ ...f, verantwortlicher_nachname: e.target.value }))}
         />
@@ -637,7 +637,7 @@ export function KundenanfragenDialog({ open, onClose, onSubmit, defaultValues, r
           value={lookupKey(fields.status) ?? ''}
           onValueChange={v => setFields(f => ({ ...f, status: v === 'none' ? undefined : v as any }))}
         >
-          <SelectTrigger id="status" className="max-sm:h-11"><SelectValue placeholder="z. B. Neu, In Prüfung" /></SelectTrigger>
+          <SelectTrigger id="status" className="max-sm:h-11"><SelectValue placeholder="" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="none">—</SelectItem>
             <SelectItem value="neu">{lookupLabel('kundenanfragen', 'status', 'neu') ?? 'Neu'}</SelectItem>
@@ -720,7 +720,7 @@ export function KundenanfragenDialog({ open, onClose, onSubmit, defaultValues, r
         <Label htmlFor="zieltermin_klaerung">{fieldLabel('kundenanfragen', 'zieltermin_klaerung')}</Label>
         <DatePicker
           id="zieltermin_klaerung"
-          placeholder="Bis wann soll geklärt sein?"
+          placeholder=""
           mode="date"
           value={fields.zieltermin_klaerung ?? null}
           onChange={v => setFields(f => ({ ...f, zieltermin_klaerung: v ?? undefined }))}
@@ -795,7 +795,7 @@ export function KundenanfragenDialog({ open, onClose, onSubmit, defaultValues, r
           inputMode="decimal"
           step="any"
           {...numberInputProps(formEnhancements, 'schaetzung_bearbeitung_min')}
-          placeholder="z. B. 120"
+          placeholder=""
           value={fields.schaetzung_bearbeitung_min !== undefined ? fields.schaetzung_bearbeitung_min : (computedValues['schaetzung_bearbeitung_min'] ?? '')}
           onChange={e => setFields(f => ({ ...f, schaetzung_bearbeitung_min: clampNumberValue(formEnhancements, 'schaetzung_bearbeitung_min', e.target.value) }))}
         />
@@ -810,7 +810,7 @@ export function KundenanfragenDialog({ open, onClose, onSubmit, defaultValues, r
           inputMode="decimal"
           step="any"
           {...numberInputProps(formEnhancements, 'gemessen_bearbeitung_min')}
-          placeholder="z. B. 95"
+          placeholder=""
           value={fields.gemessen_bearbeitung_min !== undefined ? fields.gemessen_bearbeitung_min : (computedValues['gemessen_bearbeitung_min'] ?? '')}
           onChange={e => setFields(f => ({ ...f, gemessen_bearbeitung_min: clampNumberValue(formEnhancements, 'gemessen_bearbeitung_min', e.target.value) }))}
         />
@@ -825,7 +825,7 @@ export function KundenanfragenDialog({ open, onClose, onSubmit, defaultValues, r
           inputMode="decimal"
           step="any"
           {...numberInputProps(formEnhancements, 'wartezeit_kunde_min')}
-          placeholder="z. B. 240"
+          placeholder=""
           value={fields.wartezeit_kunde_min !== undefined ? fields.wartezeit_kunde_min : (computedValues['wartezeit_kunde_min'] ?? '')}
           onChange={e => setFields(f => ({ ...f, wartezeit_kunde_min: clampNumberValue(formEnhancements, 'wartezeit_kunde_min', e.target.value) }))}
         />
@@ -840,7 +840,7 @@ export function KundenanfragenDialog({ open, onClose, onSubmit, defaultValues, r
           inputMode="decimal"
           step="any"
           {...numberInputProps(formEnhancements, 'wartezeit_intern_min')}
-          placeholder="z. B. 60"
+          placeholder=""
           value={fields.wartezeit_intern_min !== undefined ? fields.wartezeit_intern_min : (computedValues['wartezeit_intern_min'] ?? '')}
           onChange={e => setFields(f => ({ ...f, wartezeit_intern_min: clampNumberValue(formEnhancements, 'wartezeit_intern_min', e.target.value) }))}
         />
@@ -851,7 +851,7 @@ export function KundenanfragenDialog({ open, onClose, onSubmit, defaultValues, r
         <Label htmlFor="geklaert_am">{fieldLabel('kundenanfragen', 'geklaert_am')}</Label>
         <DatePicker
           id="geklaert_am"
-          placeholder="Wann wurde geklärt?"
+          placeholder=""
           mode="datetime"
           value={fields.geklaert_am ?? null}
           onChange={v => setFields(f => ({ ...f, geklaert_am: v ?? undefined }))}
@@ -867,7 +867,7 @@ export function KundenanfragenDialog({ open, onClose, onSubmit, defaultValues, r
           inputMode="decimal"
           step="any"
           {...numberInputProps(formEnhancements, 'anzahl_nachtraegliche_aenderungen')}
-          placeholder="z. B. 2"
+          placeholder=""
           value={fields.anzahl_nachtraegliche_aenderungen !== undefined ? fields.anzahl_nachtraegliche_aenderungen : (computedValues['anzahl_nachtraegliche_aenderungen'] ?? '')}
           onChange={e => setFields(f => ({ ...f, anzahl_nachtraegliche_aenderungen: clampNumberValue(formEnhancements, 'anzahl_nachtraegliche_aenderungen', e.target.value) }))}
         />
@@ -882,7 +882,7 @@ export function KundenanfragenDialog({ open, onClose, onSubmit, defaultValues, r
           inputMode="decimal"
           step="any"
           {...numberInputProps(formEnhancements, 'anzahl_nacharbeiten')}
-          placeholder="z. B. 1"
+          placeholder=""
           value={fields.anzahl_nacharbeiten !== undefined ? fields.anzahl_nacharbeiten : (computedValues['anzahl_nacharbeiten'] ?? '')}
           onChange={e => setFields(f => ({ ...f, anzahl_nacharbeiten: clampNumberValue(formEnhancements, 'anzahl_nacharbeiten', e.target.value) }))}
         />

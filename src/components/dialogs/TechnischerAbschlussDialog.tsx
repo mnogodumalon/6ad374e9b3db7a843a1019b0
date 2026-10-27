@@ -352,7 +352,7 @@ export function TechnischerAbschlussDialog({ open, onClose, onSubmit, defaultVal
         <Label htmlFor="anfrage">{fieldLabel('technischer_abschluss', 'anfrage')} <span className="text-destructive" aria-hidden="true">*</span></Label>
         <Combobox
           id="anfrage"
-          placeholder="Welche Anfrage?"
+          placeholder=""
           items={kundenanfragenListAll.map(r => ({
             id: r.record_id,
             label: String(r.fields.anfragenummer ?? r.record_id),
@@ -372,7 +372,7 @@ export function TechnischerAbschlussDialog({ open, onClose, onSubmit, defaultVal
         <Label htmlFor="pruefdatum">{fieldLabel('technischer_abschluss', 'pruefdatum')} <span className="text-destructive" aria-hidden="true">*</span></Label>
         <DatePicker
           id="pruefdatum"
-          placeholder="Wann wurde geprüft?"
+          placeholder=""
           mode="datetime"
           value={fields.pruefdatum ?? null}
           onChange={v => setFields(f => ({ ...f, pruefdatum: v ?? undefined }))}
@@ -388,7 +388,7 @@ export function TechnischerAbschlussDialog({ open, onClose, onSubmit, defaultVal
         <Label htmlFor="geprueft_von">{fieldLabel('technischer_abschluss', 'geprueft_von')} <span className="text-destructive" aria-hidden="true">*</span></Label>
         <Input
           id="geprueft_von"
-          placeholder="z. B. Anna Schmidt"
+          placeholder=""
           value={fields.geprueft_von ?? ''}
           onChange={e => setFields(f => ({ ...f, geprueft_von: e.target.value }))}
           required
@@ -455,7 +455,7 @@ export function TechnischerAbschlussDialog({ open, onClose, onSubmit, defaultVal
         <Label htmlFor="verbleibende_abweichungen">{fieldLabel('technischer_abschluss', 'verbleibende_abweichungen')}</Label>
         <Textarea
           id="verbleibende_abweichungen"
-          placeholder="Welche Abweichungen bleiben?"
+          placeholder=""
           value={fields.verbleibende_abweichungen ?? ''}
           onChange={e => setFields(f => ({ ...f, verbleibende_abweichungen: e.target.value }))}
           rows={3}
@@ -467,7 +467,7 @@ export function TechnischerAbschlussDialog({ open, onClose, onSubmit, defaultVal
         <Label htmlFor="verbleibende_risiken">{fieldLabel('technischer_abschluss', 'verbleibende_risiken')}</Label>
         <Textarea
           id="verbleibende_risiken"
-          placeholder="Welche Risiken bleiben?"
+          placeholder=""
           value={fields.verbleibende_risiken ?? ''}
           onChange={e => setFields(f => ({ ...f, verbleibende_risiken: e.target.value }))}
           rows={3}
@@ -479,7 +479,7 @@ export function TechnischerAbschlussDialog({ open, onClose, onSubmit, defaultVal
         <Label htmlFor="offene_restpunkte">{fieldLabel('technischer_abschluss', 'offene_restpunkte')}</Label>
         <Textarea
           id="offene_restpunkte"
-          placeholder="Eine Restaufgabe pro Zeile"
+          placeholder=""
           value={fields.offene_restpunkte ?? ''}
           onChange={e => setFields(f => ({ ...f, offene_restpunkte: e.target.value }))}
           rows={3}
@@ -491,7 +491,7 @@ export function TechnischerAbschlussDialog({ open, onClose, onSubmit, defaultVal
         <Label htmlFor="uebergabeempfaenger">{fieldLabel('technischer_abschluss', 'uebergabeempfaenger')}</Label>
         <Input
           id="uebergabeempfaenger"
-          placeholder="z. B. Max Mustermann"
+          placeholder=""
           value={fields.uebergabeempfaenger ?? ''}
           onChange={e => setFields(f => ({ ...f, uebergabeempfaenger: e.target.value }))}
         />
@@ -561,7 +561,7 @@ export function TechnischerAbschlussDialog({ open, onClose, onSubmit, defaultVal
         <Label htmlFor="uebergabedatum">{fieldLabel('technischer_abschluss', 'uebergabedatum')}</Label>
         <DatePicker
           id="uebergabedatum"
-          placeholder="Wann erfolgt die Übergabe?"
+          placeholder=""
           mode="datetime"
           value={fields.uebergabedatum ?? null}
           onChange={v => setFields(f => ({ ...f, uebergabedatum: v ?? undefined }))}
@@ -573,7 +573,7 @@ export function TechnischerAbschlussDialog({ open, onClose, onSubmit, defaultVal
         <Label htmlFor="zusammenfassung">{fieldLabel('technischer_abschluss', 'zusammenfassung')}</Label>
         <Textarea
           id="zusammenfassung"
-          placeholder="Kurzes Fazit der Prüfung"
+          placeholder=""
           value={fields.zusammenfassung ?? ''}
           onChange={e => setFields(f => ({ ...f, zusammenfassung: e.target.value }))}
           rows={3}

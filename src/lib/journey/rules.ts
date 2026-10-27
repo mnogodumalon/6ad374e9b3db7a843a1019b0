@@ -79,7 +79,8 @@ export interface FieldRule {
   required: boolean;
   /** Build-time label — `labelOf()` prefers the runtime i18n bundle. */
   label: string;
-  /** Whether a journey may write it (`file` is upload-only, never via a journey). */
+  /** Whether a journey may write it as a value. `file` is false: a file is UPLOADED
+   *  (`form.file(key)` → FileField; the chosen file travels in the create as a data URL). */
   writable: boolean;
   maxLength?: number;
   /** lookup / multilookup: the ONLY valid write values. */
@@ -2214,11 +2215,11 @@ export const FIELD_RULES: Record<EntityKey, Record<string, FieldRule>> = {
       "label": "Erfahrungstyp",
       "writable": true,
       "options": [
+        "beobachtung",
         "erfahrung",
         "annahme",
         "experiment",
         "wirkung",
-        "beobachtung",
         "bewaehrte_vorgehensweise"
       ]
     },

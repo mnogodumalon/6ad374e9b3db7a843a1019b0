@@ -451,7 +451,7 @@ export function BeurteilungenDialog({ open, onClose, onSubmit, defaultValues, re
         <Label htmlFor="betroffene_anforderungen">{fieldLabel('beurteilungen', 'betroffene_anforderungen')}</Label>
         <MultiCombobox
           id="betroffene_anforderungen"
-          placeholder="Welche Anforderungen?"
+          placeholder=""
           items={technischeAnforderungenListAll.map(r => ({
             id: r.record_id,
             label: String(r.fields.bezeichnung ?? r.record_id),
@@ -468,7 +468,7 @@ export function BeurteilungenDialog({ open, onClose, onSubmit, defaultValues, re
         <Label htmlFor="betroffene_offene_punkte">{fieldLabel('beurteilungen', 'betroffene_offene_punkte')}</Label>
         <MultiCombobox
           id="betroffene_offene_punkte"
-          placeholder="Welche offenen Punkte?"
+          placeholder=""
           items={offenePunkteListAll.map(r => ({
             id: r.record_id,
             label: String(r.fields.kurztitel ?? r.record_id),
@@ -485,7 +485,7 @@ export function BeurteilungenDialog({ open, onClose, onSubmit, defaultValues, re
         <Label htmlFor="zugrunde_liegende_quellen">{fieldLabel('beurteilungen', 'zugrunde_liegende_quellen')}</Label>
         <MultiCombobox
           id="zugrunde_liegende_quellen"
-          placeholder="Welche Quellen?"
+          placeholder=""
           items={informationsquellenListAll.map(r => ({
             id: r.record_id,
             label: String(r.fields.titel ?? r.record_id),
@@ -502,7 +502,7 @@ export function BeurteilungenDialog({ open, onClose, onSubmit, defaultValues, re
         <Label htmlFor="anfrage">{fieldLabel('beurteilungen', 'anfrage')} <span className="text-destructive" aria-hidden="true">*</span></Label>
         <Combobox
           id="anfrage"
-          placeholder="Welche Anfrage?"
+          placeholder=""
           items={kundenanfragenListAll.map(r => ({
             id: r.record_id,
             label: String(r.fields.anfragenummer ?? r.record_id),
@@ -522,7 +522,7 @@ export function BeurteilungenDialog({ open, onClose, onSubmit, defaultValues, re
         <Label htmlFor="beurteilungsgegenstand">{fieldLabel('beurteilungen', 'beurteilungsgegenstand')} <span className="text-destructive" aria-hidden="true">*</span></Label>
         <Input
           id="beurteilungsgegenstand"
-          placeholder="z. B. Fräsen der Gehäuseteile"
+          placeholder=""
           value={fields.beurteilungsgegenstand ?? ''}
           onChange={e => setFields(f => ({ ...f, beurteilungsgegenstand: e.target.value }))}
           required
@@ -539,7 +539,7 @@ export function BeurteilungenDialog({ open, onClose, onSubmit, defaultValues, re
           value={lookupKey(fields.beurteilungsart) ?? ''}
           onValueChange={v => setFields(f => ({ ...f, beurteilungsart: v === 'none' ? undefined : v as any }))}
         >
-          <SelectTrigger id="beurteilungsart" className="max-sm:h-11"><SelectValue placeholder="z. B. Risiko, Qualität" /></SelectTrigger>
+          <SelectTrigger id="beurteilungsart" className="max-sm:h-11"><SelectValue placeholder="" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="none">—</SelectItem>
             <SelectItem value="machbarkeit">{lookupLabel('beurteilungen', 'beurteilungsart', 'machbarkeit') ?? 'Technische Machbarkeit'}</SelectItem>
@@ -632,7 +632,7 @@ export function BeurteilungenDialog({ open, onClose, onSubmit, defaultValues, re
         <Label htmlFor="fachliche_begruendung">{fieldLabel('beurteilungen', 'fachliche_begruendung')} <span className="text-destructive" aria-hidden="true">*</span></Label>
         <Textarea
           id="fachliche_begruendung"
-          placeholder="Was spricht dafür oder dagegen?"
+          placeholder=""
           value={fields.fachliche_begruendung ?? ''}
           onChange={e => setFields(f => ({ ...f, fachliche_begruendung: e.target.value }))}
           rows={3}
@@ -647,7 +647,7 @@ export function BeurteilungenDialog({ open, onClose, onSubmit, defaultValues, re
         <Label htmlFor="annahmen">{fieldLabel('beurteilungen', 'annahmen')}</Label>
         <Textarea
           id="annahmen"
-          placeholder="Eine Annahme pro Zeile"
+          placeholder=""
           value={fields.annahmen ?? ''}
           onChange={e => setFields(f => ({ ...f, annahmen: e.target.value }))}
           rows={3}
@@ -659,7 +659,7 @@ export function BeurteilungenDialog({ open, onClose, onSubmit, defaultValues, re
         <Label htmlFor="unsicherheiten">{fieldLabel('beurteilungen', 'unsicherheiten')}</Label>
         <Textarea
           id="unsicherheiten"
-          placeholder="Eine Unsicherheit pro Zeile"
+          placeholder=""
           value={fields.unsicherheiten ?? ''}
           onChange={e => setFields(f => ({ ...f, unsicherheiten: e.target.value }))}
           rows={3}
@@ -671,7 +671,7 @@ export function BeurteilungenDialog({ open, onClose, onSubmit, defaultValues, re
         <Label htmlFor="alternativen">{fieldLabel('beurteilungen', 'alternativen')}</Label>
         <Textarea
           id="alternativen"
-          placeholder="Eine Alternative pro Zeile"
+          placeholder=""
           value={fields.alternativen ?? ''}
           onChange={e => setFields(f => ({ ...f, alternativen: e.target.value }))}
           rows={3}
@@ -683,7 +683,7 @@ export function BeurteilungenDialog({ open, onClose, onSubmit, defaultValues, re
         <Label htmlFor="empfehlung">{fieldLabel('beurteilungen', 'empfehlung')}</Label>
         <Textarea
           id="empfehlung"
-          placeholder="Was wird empfohlen?"
+          placeholder=""
           value={fields.empfehlung ?? ''}
           onChange={e => setFields(f => ({ ...f, empfehlung: e.target.value }))}
           rows={3}
@@ -708,7 +708,7 @@ export function BeurteilungenDialog({ open, onClose, onSubmit, defaultValues, re
         <Label htmlFor="erstellt_von">{fieldLabel('beurteilungen', 'erstellt_von')}</Label>
         <Input
           id="erstellt_von"
-          placeholder="z. B. Anna Schmidt"
+          placeholder=""
           value={fields.erstellt_von ?? ''}
           onChange={e => setFields(f => ({ ...f, erstellt_von: e.target.value }))}
         />
@@ -719,7 +719,7 @@ export function BeurteilungenDialog({ open, onClose, onSubmit, defaultValues, re
         <Label htmlFor="erstellt_am">{fieldLabel('beurteilungen', 'erstellt_am')}</Label>
         <DatePicker
           id="erstellt_am"
-          placeholder="Wann wurde sie erstellt?"
+          placeholder=""
           mode="datetime"
           value={fields.erstellt_am ?? null}
           onChange={v => setFields(f => ({ ...f, erstellt_am: v ?? undefined }))}
@@ -790,7 +790,7 @@ export function BeurteilungenDialog({ open, onClose, onSubmit, defaultValues, re
         <Label htmlFor="geprueft_von">{fieldLabel('beurteilungen', 'geprueft_von')}</Label>
         <Input
           id="geprueft_von"
-          placeholder="z. B. Max Weber"
+          placeholder=""
           value={fields.geprueft_von ?? ''}
           onChange={e => setFields(f => ({ ...f, geprueft_von: e.target.value }))}
         />
@@ -801,7 +801,7 @@ export function BeurteilungenDialog({ open, onClose, onSubmit, defaultValues, re
         <Label htmlFor="geprueft_am">{fieldLabel('beurteilungen', 'geprueft_am')}</Label>
         <DatePicker
           id="geprueft_am"
-          placeholder="Wann wurde geprüft?"
+          placeholder=""
           mode="datetime"
           value={fields.geprueft_am ?? null}
           onChange={v => setFields(f => ({ ...f, geprueft_am: v ?? undefined }))}

@@ -1,11 +1,11 @@
 import type { WiederverwendungVonErfahrungen, Erfahrungen, Kundenanfragen } from '@/types/app';
 import { APP_IDS } from '@/types/app';
-import { usePermissions } from '@/lib/permissions';
 import { extractRecordId } from '@/services/livingAppsService';
 import {
   RecordSection, RecordField, RecordRelation, RecordAttachments,
 } from '@/components/widgets/RecordView';
 import { t, appLabel, fieldLabel } from '@/i18n';
+import { usePermissions } from '@/lib/permissions';
 
 export interface WiederverwendungVonErfahrungenDetailsProps {
   /** Der Record — enriched oder roh; alle Felder werden hier gerendert. */

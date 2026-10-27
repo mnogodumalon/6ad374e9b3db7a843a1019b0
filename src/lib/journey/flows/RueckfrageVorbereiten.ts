@@ -1,7 +1,7 @@
 /**
  * useRueckfrageVorbereitenFlow — the plumbing of the flow « Rückfrage vorbereiten », generated from the plan.
  *
- * Writes `rueckfragen_und_kommunikation`: asks `anfrage`, `zugehoerige_offene_punkte`, `kanal`, `absender`, `empfaenger`, `betreff`, `inhalt`, `antwort_erwartet_bis`; sets `kommunikationstyp`, `versandstatus`, `antwortstatus` itself.
+ * Writes `rueckfragen_und_kommunikation`: asks `kanal`, `inhalt`, `anfrage`, `betreff`, `absender`, `empfaenger`, `antwort_erwartet_bis`, `zugehoerige_offene_punkte`; sets `antwortstatus`, `versandstatus`, `kommunikationstyp` itself.
 Changes `offene_punkte` (only when the person fills it): the record to change is picked (`flow.pick('offene_punkte')`), the form is prefilled with its values; ; sets `status` itself.
 Changes `kundenanfragen` (only when the person fills it): the record to change is picked (`flow.pick('kundenanfragen')`), the form is prefilled with its values; ; sets `status` itself.
  * The hook OWNS: the form(s) with exactly these fields and the plan's required
@@ -18,7 +18,7 @@ Changes `kundenanfragen` (only when the person fills it): the record to change i
  *   messages  the sentence for an empty required field, per field
  *
  *   const flow = useRueckfrageVorbereitenFlow({
- *     steps: { offene_punkte: 1, kundenanfragen: 2, anfrage: 3, zugehoerige_offene_punkte: 4, kanal: 5, absender: 5, empfaenger: 5, betreff: 5, inhalt: 5, antwort_erwartet_bis: 5 },
+ *     steps: { offene_punkte: 1, kundenanfragen: 2, anfrage: 3, zugehoerige_offene_punkte: 4, kanal: 5, inhalt: 5, betreff: 5, absender: 5, empfaenger: 5, antwort_erwartet_bis: 5 },
  *     items: { anfrage: r => ({ id: r.id, title: fieldText(r, 'anfragenummer') }) },
  *   });
  *   <IntentWizardShell forms={flow.forms} draftKey={flow.draftKey} …>
@@ -27,17 +27,17 @@ Changes `kundenanfragen` (only when the person fills it): the record to change i
  *     // the record this flow changes: <EntitySelectStep {...flow.picks.offene_punkte.select} {...flow.pick('offene_punkte')} />
  *     // the record this flow changes: <EntitySelectStep {...flow.picks.kundenanfragen.select} {...flow.pick('kundenanfragen')} />
  *     <Bound form={flow.forms.rueckfragen_und_kommunikation} name="kanal" />
+ *     <Bound form={flow.forms.rueckfragen_und_kommunikation} name="inhalt" />
+ *     <Bound form={flow.forms.rueckfragen_und_kommunikation} name="betreff" />
  *     <Bound form={flow.forms.rueckfragen_und_kommunikation} name="absender" />
  *     <Bound form={flow.forms.rueckfragen_und_kommunikation} name="empfaenger" />
- *     <Bound form={flow.forms.rueckfragen_und_kommunikation} name="betreff" />
- *     <Bound form={flow.forms.rueckfragen_und_kommunikation} name="inhalt" />
  *     <Bound form={flow.forms.rueckfragen_und_kommunikation} name="antwort_erwartet_bis" />
  *     <StepNav onNext={() => flow.validateStep(n)} />
  *     {!flow.submit.done && <SummaryStep forms={flow.formList} submit={flow.submit} />}
  *     {flow.submit.result && <SuccessStep result={flow.submit.result} forms={flow.formList} submit={flow.submit} />}
  *   </IntentWizardShell>
  */
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   useStepForm, useJourneySubmit, useRecordSearch,
   fieldText, fieldLookup, fieldLookups, fieldNumber, fieldDate, fieldRef,
@@ -106,10 +106,10 @@ export function useRueckfrageVorbereitenFlow(options: RueckfrageVorbereitenFlowO
   const [offene_punkteTargetId, setOffenePunkteTargetId] = useState<string | null>(null);
   const [kundenanfragenTargetId, setKundenanfragenTargetId] = useState<string | null>(null);
   const rueckfragen_und_kommunikation = useStepForm('rueckfragen_und_kommunikation', {
-    fields: ["anfrage", "zugehoerige_offene_punkte", "kanal", "absender", "empfaenger", "betreff", "inhalt", "antwort_erwartet_bis"],
-    steps: only(steps, ["anfrage", "zugehoerige_offene_punkte", "kanal", "absender", "empfaenger", "betreff", "inhalt", "antwort_erwartet_bis"]) as Record<string, number>,
-    initial: only(options.initial as FormValues | undefined, ["anfrage", "zugehoerige_offene_punkte", "kanal", "absender", "empfaenger", "betreff", "inhalt", "antwort_erwartet_bis"]),
-    messages: only(options.messages as Record<string, string> | undefined, ["anfrage", "zugehoerige_offene_punkte", "kanal", "absender", "empfaenger", "betreff", "inhalt", "antwort_erwartet_bis"]),
+    fields: ["kanal", "inhalt", "anfrage", "betreff", "absender", "empfaenger", "antwort_erwartet_bis", "zugehoerige_offene_punkte"],
+    steps: only(steps, ["kanal", "inhalt", "anfrage", "betreff", "absender", "empfaenger", "antwort_erwartet_bis", "zugehoerige_offene_punkte"]) as Record<string, number>,
+    initial: only(options.initial as FormValues | undefined, ["kanal", "inhalt", "anfrage", "betreff", "absender", "empfaenger", "antwort_erwartet_bis", "zugehoerige_offene_punkte"]),
+    messages: only(options.messages as Record<string, string> | undefined, ["kanal", "inhalt", "anfrage", "betreff", "absender", "empfaenger", "antwort_erwartet_bis", "zugehoerige_offene_punkte"]),
   });
   const offene_punkte = useStepForm('offene_punkte', {
     fields: [],
@@ -179,13 +179,13 @@ export function useRueckfrageVorbereitenFlow(options: RueckfrageVorbereitenFlowO
     {
       key: 'rueckfragen_und_kommunikation', entity: 'rueckfragen_und_kommunikation', form: rueckfragen_und_kommunikation, primary: true,
       values: (): FormValues => ({
-        kommunikationstyp: policyFixedValue('rueckfragen_und_kommunikation', 'kommunikationstyp') ?? "kundenrueckfrage",
-        versandstatus: policyFixedValue('rueckfragen_und_kommunikation', 'versandstatus') ?? "entwurf",
         antwortstatus: policyFixedValue('rueckfragen_und_kommunikation', 'antwortstatus') ?? "offen",
+        versandstatus: policyFixedValue('rueckfragen_und_kommunikation', 'versandstatus') ?? "entwurf",
+        kommunikationstyp: policyFixedValue('rueckfragen_und_kommunikation', 'kommunikationstyp') ?? "kundenrueckfrage",
       }),
 
       // the review shows what this step sets itself — changeable on „Deine Anwendung“, not here
-      settings: () => [setting('rueckfragen_und_kommunikation', 'kommunikationstyp', policyFixedValue('rueckfragen_und_kommunikation', 'kommunikationstyp') ?? "kundenrueckfrage"), setting('rueckfragen_und_kommunikation', 'versandstatus', policyFixedValue('rueckfragen_und_kommunikation', 'versandstatus') ?? "entwurf"), setting('rueckfragen_und_kommunikation', 'antwortstatus', policyFixedValue('rueckfragen_und_kommunikation', 'antwortstatus') ?? "offen")],
+      settings: () => [setting('rueckfragen_und_kommunikation', 'antwortstatus', policyFixedValue('rueckfragen_und_kommunikation', 'antwortstatus') ?? "offen"), setting('rueckfragen_und_kommunikation', 'versandstatus', policyFixedValue('rueckfragen_und_kommunikation', 'versandstatus') ?? "entwurf"), setting('rueckfragen_und_kommunikation', 'kommunikationstyp', policyFixedValue('rueckfragen_und_kommunikation', 'kommunikationstyp') ?? "kundenrueckfrage")],
     },
     ...(offene_punkteFilled ? [{
       key: 'offene_punkte', entity: 'offene_punkte', form: offene_punkte,
@@ -241,6 +241,21 @@ export function useRueckfrageVorbereitenFlow(options: RueckfrageVorbereitenFlowO
       get record(): JourneyRecord | undefined { return kundenanfragenTargetId ? picks.kundenanfragen.recordOf(kundenanfragenTargetId) : undefined; },
     },
   };
+  // Opened for one record — `#/intents/rueckfrage-vorbereiten?record=<id>`, the dashboard's
+  // flowActionFor(): that record is the one to change. Loaded, taken into the
+  // pick and selected — when this flow may change it at all (the pick's rule).
+  const [linkedId] = useState(() => new URLSearchParams(window.location.hash.split('?')[1] ?? '').get('record'));
+  useEffect(() => {
+    if (!linkedId) return;
+    let on = true;
+    void servicePort.get('offene_punkte', linkedId).then(rec => {
+      if (!on || !rec || !((r: JourneyRecord) => ["neu", "zugewiesen", "in_bearbeitung"].includes(fieldLookup(r, "status")?.key ?? ''))(rec)) return;
+      picks.offene_punkte.adopt(rec);
+      targets.offene_punkte.onSelect(rec.id);
+    }).catch(() => undefined);
+    return () => { on = false; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- once per link
+  }, [linkedId]);
   /** Props for a single-record pick step: {...flow.picks.x.select} {...flow.pick('x')} */
   const pick = (field: RueckfrageVorbereitenFieldKey) => {
     if (field in targets) {

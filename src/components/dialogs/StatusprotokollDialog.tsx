@@ -354,7 +354,7 @@ export function StatusprotokollDialog({ open, onClose, onSubmit, defaultValues, 
         <Label htmlFor="anfrage">{fieldLabel('statusprotokoll', 'anfrage')} <span className="text-destructive" aria-hidden="true">*</span></Label>
         <Combobox
           id="anfrage"
-          placeholder="Welche Anfrage?"
+          placeholder=""
           items={kundenanfragenListAll.map(r => ({
             id: r.record_id,
             label: String(r.fields.anfragenummer ?? r.record_id),
@@ -376,7 +376,7 @@ export function StatusprotokollDialog({ open, onClose, onSubmit, defaultValues, 
           value={lookupKey(fields.objekttyp) ?? ''}
           onValueChange={v => setFields(f => ({ ...f, objekttyp: v === 'none' ? undefined : v as any }))}
         >
-          <SelectTrigger id="objekttyp" className="max-sm:h-11"><SelectValue placeholder="z. B. Aufgabe, Entscheidung" /></SelectTrigger>
+          <SelectTrigger id="objekttyp" className="max-sm:h-11"><SelectValue placeholder="" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="none">—</SelectItem>
             <SelectItem value="kundenanfrage">{lookupLabel('statusprotokoll', 'objekttyp', 'kundenanfrage') ?? 'Kundenanfrage'}</SelectItem>
@@ -401,7 +401,7 @@ export function StatusprotokollDialog({ open, onClose, onSubmit, defaultValues, 
         <Label htmlFor="objektbezeichnung">{fieldLabel('statusprotokoll', 'objektbezeichnung')} <span className="text-destructive" aria-hidden="true">*</span></Label>
         <Input
           id="objektbezeichnung"
-          placeholder="z. B. Prüfung Zeichnung 4711"
+          placeholder=""
           value={fields.objektbezeichnung ?? ''}
           onChange={e => setFields(f => ({ ...f, objektbezeichnung: e.target.value }))}
           required
@@ -416,7 +416,7 @@ export function StatusprotokollDialog({ open, onClose, onSubmit, defaultValues, 
         <Label htmlFor="alter_status">{fieldLabel('statusprotokoll', 'alter_status')}</Label>
         <Input
           id="alter_status"
-          placeholder="z. B. Offen"
+          placeholder=""
           value={fields.alter_status ?? ''}
           onChange={e => setFields(f => ({ ...f, alter_status: e.target.value }))}
         />
@@ -427,7 +427,7 @@ export function StatusprotokollDialog({ open, onClose, onSubmit, defaultValues, 
         <Label htmlFor="neuer_status">{fieldLabel('statusprotokoll', 'neuer_status')} <span className="text-destructive" aria-hidden="true">*</span></Label>
         <Input
           id="neuer_status"
-          placeholder="z. B. In Bearbeitung"
+          placeholder=""
           value={fields.neuer_status ?? ''}
           onChange={e => setFields(f => ({ ...f, neuer_status: e.target.value }))}
           required
@@ -442,7 +442,7 @@ export function StatusprotokollDialog({ open, onClose, onSubmit, defaultValues, 
         <Label htmlFor="zeitpunkt">{fieldLabel('statusprotokoll', 'zeitpunkt')} <span className="text-destructive" aria-hidden="true">*</span></Label>
         <DatePicker
           id="zeitpunkt"
-          placeholder="Wann wurde der Status geändert?"
+          placeholder=""
           mode="datetime"
           value={fields.zeitpunkt ?? null}
           onChange={v => setFields(f => ({ ...f, zeitpunkt: v ?? undefined }))}
@@ -458,7 +458,7 @@ export function StatusprotokollDialog({ open, onClose, onSubmit, defaultValues, 
         <Label htmlFor="benutzer_vorname">{fieldLabel('statusprotokoll', 'benutzer_vorname')} <span className="text-destructive" aria-hidden="true">*</span></Label>
         <Input
           id="benutzer_vorname"
-          placeholder="z. B. Anna"
+          placeholder=""
           value={fields.benutzer_vorname ?? ''}
           onChange={e => setFields(f => ({ ...f, benutzer_vorname: e.target.value }))}
           required
@@ -473,7 +473,7 @@ export function StatusprotokollDialog({ open, onClose, onSubmit, defaultValues, 
         <Label htmlFor="benutzer_nachname">{fieldLabel('statusprotokoll', 'benutzer_nachname')} <span className="text-destructive" aria-hidden="true">*</span></Label>
         <Input
           id="benutzer_nachname"
-          placeholder="z. B. Müller"
+          placeholder=""
           value={fields.benutzer_nachname ?? ''}
           onChange={e => setFields(f => ({ ...f, benutzer_nachname: e.target.value }))}
           required
@@ -488,7 +488,7 @@ export function StatusprotokollDialog({ open, onClose, onSubmit, defaultValues, 
         <Label htmlFor="begruendung">{fieldLabel('statusprotokoll', 'begruendung')}</Label>
         <Textarea
           id="begruendung"
-          placeholder="Warum wurde der Status geändert?"
+          placeholder=""
           value={fields.begruendung ?? ''}
           onChange={e => setFields(f => ({ ...f, begruendung: e.target.value }))}
           rows={3}

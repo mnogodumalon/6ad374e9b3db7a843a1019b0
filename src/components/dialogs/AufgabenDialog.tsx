@@ -399,7 +399,7 @@ export function AufgabenDialog({ open, onClose, onSubmit, defaultValues, recordI
         <Label htmlFor="anfrage">{fieldLabel('aufgaben', 'anfrage')} <span className="text-destructive" aria-hidden="true">*</span></Label>
         <Combobox
           id="anfrage"
-          placeholder="Welche Anfrage?"
+          placeholder=""
           items={kundenanfragenListAll.map(r => ({
             id: r.record_id,
             label: String(r.fields.anfragenummer ?? r.record_id),
@@ -419,7 +419,7 @@ export function AufgabenDialog({ open, onClose, onSubmit, defaultValues, recordI
         <Label htmlFor="titel">{fieldLabel('aufgaben', 'titel')} <span className="text-destructive" aria-hidden="true">*</span></Label>
         <Input
           id="titel"
-          placeholder="z. B. Normenprüfung DIN EN 10025"
+          placeholder=""
           value={fields.titel ?? ''}
           onChange={e => setFields(f => ({ ...f, titel: e.target.value }))}
           required
@@ -434,7 +434,7 @@ export function AufgabenDialog({ open, onClose, onSubmit, defaultValues, recordI
         <Label htmlFor="beschreibung">{fieldLabel('aufgaben', 'beschreibung')}</Label>
         <Textarea
           id="beschreibung"
-          placeholder="Was ist zu tun, was ist das Ziel?"
+          placeholder=""
           value={fields.beschreibung ?? ''}
           onChange={e => setFields(f => ({ ...f, beschreibung: e.target.value }))}
           rows={3}
@@ -448,7 +448,7 @@ export function AufgabenDialog({ open, onClose, onSubmit, defaultValues, recordI
           value={lookupKey(fields.aufgabentyp) ?? ''}
           onValueChange={v => setFields(f => ({ ...f, aufgabentyp: v === 'none' ? undefined : v as any }))}
         >
-          <SelectTrigger id="aufgabentyp" className="max-sm:h-11"><SelectValue placeholder="z. B. Normenprüfung, Dokumentation" /></SelectTrigger>
+          <SelectTrigger id="aufgabentyp" className="max-sm:h-11"><SelectValue placeholder="" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="none">—</SelectItem>
             <SelectItem value="informationspruefung">{lookupLabel('aufgaben', 'aufgabentyp', 'informationspruefung') ?? 'Informationsprüfung'}</SelectItem>
@@ -470,7 +470,7 @@ export function AufgabenDialog({ open, onClose, onSubmit, defaultValues, recordI
         <Label htmlFor="verantwortlicher_vorname">{fieldLabel('aufgaben', 'verantwortlicher_vorname')} <span className="text-destructive" aria-hidden="true">*</span></Label>
         <Input
           id="verantwortlicher_vorname"
-          placeholder="z. B. Anna"
+          placeholder=""
           value={fields.verantwortlicher_vorname ?? ''}
           onChange={e => setFields(f => ({ ...f, verantwortlicher_vorname: e.target.value }))}
           required
@@ -485,7 +485,7 @@ export function AufgabenDialog({ open, onClose, onSubmit, defaultValues, recordI
         <Label htmlFor="verantwortlicher_nachname">{fieldLabel('aufgaben', 'verantwortlicher_nachname')} <span className="text-destructive" aria-hidden="true">*</span></Label>
         <Input
           id="verantwortlicher_nachname"
-          placeholder="z. B. Schmidt"
+          placeholder=""
           value={fields.verantwortlicher_nachname ?? ''}
           onChange={e => setFields(f => ({ ...f, verantwortlicher_nachname: e.target.value }))}
           required
@@ -500,7 +500,7 @@ export function AufgabenDialog({ open, onClose, onSubmit, defaultValues, recordI
         <Label htmlFor="mitwirkende">{fieldLabel('aufgaben', 'mitwirkende')}</Label>
         <Input
           id="mitwirkende"
-          placeholder="z. B. Max Weber, Lisa Braun"
+          placeholder=""
           value={fields.mitwirkende ?? ''}
           onChange={e => setFields(f => ({ ...f, mitwirkende: e.target.value }))}
         />
@@ -572,7 +572,7 @@ export function AufgabenDialog({ open, onClose, onSubmit, defaultValues, recordI
           value={lookupKey(fields.status) ?? ''}
           onValueChange={v => setFields(f => ({ ...f, status: v === 'none' ? undefined : v as any }))}
         >
-          <SelectTrigger id="status" className="max-sm:h-11"><SelectValue placeholder="z. B. Offen, Erledigt" /></SelectTrigger>
+          <SelectTrigger id="status" className="max-sm:h-11"><SelectValue placeholder="" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="none">—</SelectItem>
             <SelectItem value="offen">{lookupLabel('aufgaben', 'status', 'offen') ?? 'Offen'}</SelectItem>
@@ -593,7 +593,7 @@ export function AufgabenDialog({ open, onClose, onSubmit, defaultValues, recordI
         <Label htmlFor="faellig_am">{fieldLabel('aufgaben', 'faellig_am')}</Label>
         <DatePicker
           id="faellig_am"
-          placeholder="Bis wann ist es fällig?"
+          placeholder=""
           mode="date"
           value={fields.faellig_am ?? null}
           onChange={v => setFields(f => ({ ...f, faellig_am: v ?? undefined }))}
@@ -605,7 +605,7 @@ export function AufgabenDialog({ open, onClose, onSubmit, defaultValues, recordI
         <Label htmlFor="blockierungsgrund">{fieldLabel('aufgaben', 'blockierungsgrund')}</Label>
         <Textarea
           id="blockierungsgrund"
-          placeholder="Was blockiert, was folgt als Nächstes?"
+          placeholder=""
           value={fields.blockierungsgrund ?? ''}
           onChange={e => setFields(f => ({ ...f, blockierungsgrund: e.target.value }))}
           rows={3}
@@ -617,7 +617,7 @@ export function AufgabenDialog({ open, onClose, onSubmit, defaultValues, recordI
         <Label htmlFor="ergebnis">{fieldLabel('aufgaben', 'ergebnis')}</Label>
         <Textarea
           id="ergebnis"
-          placeholder="Was kam dabei heraus?"
+          placeholder=""
           value={fields.ergebnis ?? ''}
           onChange={e => setFields(f => ({ ...f, ergebnis: e.target.value }))}
           rows={3}
@@ -629,7 +629,7 @@ export function AufgabenDialog({ open, onClose, onSubmit, defaultValues, recordI
         <Label htmlFor="abgeschlossen_am">{fieldLabel('aufgaben', 'abgeschlossen_am')}</Label>
         <DatePicker
           id="abgeschlossen_am"
-          placeholder="Wann wurde es abgeschlossen?"
+          placeholder=""
           mode="datetime"
           value={fields.abgeschlossen_am ?? null}
           onChange={v => setFields(f => ({ ...f, abgeschlossen_am: v ?? undefined }))}
@@ -641,7 +641,7 @@ export function AufgabenDialog({ open, onClose, onSubmit, defaultValues, recordI
         <Label htmlFor="offener_punkt">{fieldLabel('aufgaben', 'offener_punkt')}</Label>
         <Combobox
           id="offener_punkt"
-          placeholder="Welcher offene Punkt?"
+          placeholder=""
           items={offenePunkteListAll.map(r => ({
             id: r.record_id,
             label: String(r.fields.kurztitel ?? r.record_id),
@@ -658,7 +658,7 @@ export function AufgabenDialog({ open, onClose, onSubmit, defaultValues, recordI
         <Label htmlFor="abhaengige_aufgaben">{fieldLabel('aufgaben', 'abhaengige_aufgaben')}</Label>
         <MultiCombobox
           id="abhaengige_aufgaben"
-          placeholder="Welche Aufgaben hängen daran?"
+          placeholder=""
           items={aufgabenList.map(r => ({
             id: r.record_id,
             label: String(r.fields.titel ?? r.record_id),

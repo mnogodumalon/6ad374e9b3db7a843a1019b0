@@ -378,7 +378,7 @@ export function InformationsquellenDialog({ open, onClose, onSubmit, defaultValu
         <Label htmlFor="eingangszeitpunkt">{fieldLabel('informationsquellen', 'eingangszeitpunkt')}</Label>
         <DatePicker
           id="eingangszeitpunkt"
-          placeholder="Wann ging sie ein?"
+          placeholder=""
           mode="datetime"
           value={fields.eingangszeitpunkt ?? null}
           onChange={v => setFields(f => ({ ...f, eingangszeitpunkt: v ?? undefined }))}
@@ -390,7 +390,7 @@ export function InformationsquellenDialog({ open, onClose, onSubmit, defaultValu
         <Label htmlFor="versionskennung">{fieldLabel('informationsquellen', 'versionskennung')}</Label>
         <Input
           id="versionskennung"
-          placeholder="z. B. v2.1"
+          placeholder=""
           value={fields.versionskennung ?? ''}
           onChange={e => setFields(f => ({ ...f, versionskennung: e.target.value }))}
         />
@@ -473,7 +473,7 @@ export function InformationsquellenDialog({ open, onClose, onSubmit, defaultValu
         <Label htmlFor="zusammenfassung">{fieldLabel('informationsquellen', 'zusammenfassung')}</Label>
         <Textarea
           id="zusammenfassung"
-          placeholder="Worum geht es inhaltlich?"
+          placeholder=""
           value={fields.zusammenfassung ?? ''}
           onChange={e => setFields(f => ({ ...f, zusammenfassung: e.target.value }))}
           rows={3}
@@ -557,7 +557,7 @@ export function InformationsquellenDialog({ open, onClose, onSubmit, defaultValu
         <Label htmlFor="pruefung_durch">{fieldLabel('informationsquellen', 'pruefung_durch')}</Label>
         <Input
           id="pruefung_durch"
-          placeholder="z. B. Max Mustermann"
+          placeholder=""
           value={fields.pruefung_durch ?? ''}
           onChange={e => setFields(f => ({ ...f, pruefung_durch: e.target.value }))}
         />
@@ -568,7 +568,7 @@ export function InformationsquellenDialog({ open, onClose, onSubmit, defaultValu
         <Label htmlFor="pruefung_am">{fieldLabel('informationsquellen', 'pruefung_am')}</Label>
         <DatePicker
           id="pruefung_am"
-          placeholder="Wann wurde geprüft?"
+          placeholder=""
           mode="datetime"
           value={fields.pruefung_am ?? null}
           onChange={v => setFields(f => ({ ...f, pruefung_am: v ?? undefined }))}
@@ -593,7 +593,7 @@ export function InformationsquellenDialog({ open, onClose, onSubmit, defaultValu
         <Label htmlFor="bemerkung">{fieldLabel('informationsquellen', 'bemerkung')}</Label>
         <Textarea
           id="bemerkung"
-          placeholder="Weitere Hinweise"
+          placeholder=""
           value={fields.bemerkung ?? ''}
           onChange={e => setFields(f => ({ ...f, bemerkung: e.target.value }))}
           rows={3}
@@ -605,7 +605,7 @@ export function InformationsquellenDialog({ open, onClose, onSubmit, defaultValu
         <Label htmlFor="ersetzt_quelle">{fieldLabel('informationsquellen', 'ersetzt_quelle')}</Label>
         <Combobox
           id="ersetzt_quelle"
-          placeholder="Welche Quelle wird ersetzt?"
+          placeholder=""
           items={informationsquellenList.map(r => ({
             id: r.record_id,
             label: String(r.fields.titel ?? r.record_id),
@@ -620,7 +620,7 @@ export function InformationsquellenDialog({ open, onClose, onSubmit, defaultValu
         <Label htmlFor="anfrage">{fieldLabel('informationsquellen', 'anfrage')} <span className="text-destructive" aria-hidden="true">*</span></Label>
         <Combobox
           id="anfrage"
-          placeholder="Welche Anfrage?"
+          placeholder=""
           items={kundenanfragenListAll.map(r => ({
             id: r.record_id,
             label: String(r.fields.anfragenummer ?? r.record_id),
@@ -642,7 +642,7 @@ export function InformationsquellenDialog({ open, onClose, onSubmit, defaultValu
           value={lookupKey(fields.quellentyp) ?? ''}
           onValueChange={v => setFields(f => ({ ...f, quellentyp: v === 'none' ? undefined : v as any }))}
         >
-          <SelectTrigger id="quellentyp" className="max-sm:h-11"><SelectValue placeholder="z. B. E-Mail, PDF" /></SelectTrigger>
+          <SelectTrigger id="quellentyp" className="max-sm:h-11"><SelectValue placeholder="" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="none">—</SelectItem>
             <SelectItem value="email">{lookupLabel('informationsquellen', 'quellentyp', 'email') ?? 'E-Mail'}</SelectItem>
@@ -668,7 +668,7 @@ export function InformationsquellenDialog({ open, onClose, onSubmit, defaultValu
         <Label htmlFor="titel">{fieldLabel('informationsquellen', 'titel')} <span className="text-destructive" aria-hidden="true">*</span></Label>
         <Input
           id="titel"
-          placeholder="z. B. Zeichnung Gehäuse"
+          placeholder=""
           value={fields.titel ?? ''}
           onChange={e => setFields(f => ({ ...f, titel: e.target.value }))}
           required
@@ -755,7 +755,7 @@ export function InformationsquellenDialog({ open, onClose, onSubmit, defaultValu
           id="referenz_url"
           type="url"
           inputMode="url"
-          placeholder="z. B. https://example.com"
+          placeholder=""
           value={fields.referenz_url ?? ''}
           onChange={e => setFields(f => ({ ...f, referenz_url: e.target.value }))}
         />
@@ -766,7 +766,7 @@ export function InformationsquellenDialog({ open, onClose, onSubmit, defaultValu
         <Label htmlFor="urheber">{fieldLabel('informationsquellen', 'urheber')}</Label>
         <Input
           id="urheber"
-          placeholder="z. B. Firma Müller GmbH"
+          placeholder=""
           value={fields.urheber ?? ''}
           onChange={e => setFields(f => ({ ...f, urheber: e.target.value }))}
         />
@@ -777,7 +777,7 @@ export function InformationsquellenDialog({ open, onClose, onSubmit, defaultValu
         <Label htmlFor="quellendatum">{fieldLabel('informationsquellen', 'quellendatum')}</Label>
         <DatePicker
           id="quellendatum"
-          placeholder="Von wann ist die Quelle?"
+          placeholder=""
           mode="date"
           value={fields.quellendatum ?? null}
           onChange={v => setFields(f => ({ ...f, quellendatum: v ?? undefined }))}

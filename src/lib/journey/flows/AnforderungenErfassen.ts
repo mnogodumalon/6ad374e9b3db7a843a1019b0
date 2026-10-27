@@ -1,7 +1,7 @@
 /**
  * useAnforderungenErfassenFlow — the plumbing of the flow « Anforderungen erfassen », generated from the plan.
  *
- * Writes `technische_anforderungen`: asks `anfrage`, `bezeichnung`, `beschreibung`, `anforderungstyp`, `ursprung`, `sollwert`, `einheit`, `vergleichsoperator`, `min_wert`, `max_wert`, `ist_pflichtanforderung`, `quellen`; sets `pruefstatus` itself.
+ * Writes `technische_anforderungen`: asks `anfrage`, `einheit`, `quellen`, `max_wert`, `min_wert`, `sollwert`, `ursprung`, `bezeichnung`, `beschreibung`, `anforderungstyp`, `vergleichsoperator`, `ist_pflichtanforderung`; sets `pruefstatus` itself.
 Changes `kundenanfragen` (only when the person fills it): the record to change is picked (`flow.pick('kundenanfragen')`), the form is prefilled with its values; ; sets `status` itself.
  * The hook OWNS: the form(s) with exactly these fields and the plan's required
  * ingredients, one record search per picked field (columns and filter from
@@ -17,29 +17,29 @@ Changes `kundenanfragen` (only when the person fills it): the record to change i
  *   messages  the sentence for an empty required field, per field
  *
  *   const flow = useAnforderungenErfassenFlow({
- *     steps: { kundenanfragen: 1, anfrage: 2, quellen: 3, bezeichnung: 4, beschreibung: 4, anforderungstyp: 4, ursprung: 4, sollwert: 4, einheit: 4, vergleichsoperator: 4, min_wert: 4, max_wert: 4, ist_pflichtanforderung: 4 },
+ *     steps: { kundenanfragen: 1, anfrage: 2, quellen: 3, einheit: 4, max_wert: 4, min_wert: 4, sollwert: 4, ursprung: 4, bezeichnung: 4, beschreibung: 4, anforderungstyp: 4, vergleichsoperator: 4, ist_pflichtanforderung: 4 },
  *     items: { anfrage: r => ({ id: r.id, title: fieldText(r, 'anfragenummer') }) },
  *   });
  *   <IntentWizardShell forms={flow.forms} draftKey={flow.draftKey} …>
  *     <EntitySelectStep {...flow.picks.anfrage.select} {...flow.pick('anfrage')} />
  *     <EntitySelectStep {...flow.picks.quellen.select} {...flow.pickMany('quellen')} />
  *     // the record this flow changes: <EntitySelectStep {...flow.picks.kundenanfragen.select} {...flow.pick('kundenanfragen')} />
+ *     <Bound form={flow.forms.technische_anforderungen} name="einheit" />
+ *     <Bound form={flow.forms.technische_anforderungen} name="max_wert" />
+ *     <Bound form={flow.forms.technische_anforderungen} name="min_wert" />
+ *     <Bound form={flow.forms.technische_anforderungen} name="sollwert" />
+ *     <Bound form={flow.forms.technische_anforderungen} name="ursprung" />
  *     <Bound form={flow.forms.technische_anforderungen} name="bezeichnung" />
  *     <Bound form={flow.forms.technische_anforderungen} name="beschreibung" />
  *     <Bound form={flow.forms.technische_anforderungen} name="anforderungstyp" />
- *     <Bound form={flow.forms.technische_anforderungen} name="ursprung" />
- *     <Bound form={flow.forms.technische_anforderungen} name="sollwert" />
- *     <Bound form={flow.forms.technische_anforderungen} name="einheit" />
  *     <Bound form={flow.forms.technische_anforderungen} name="vergleichsoperator" />
- *     <Bound form={flow.forms.technische_anforderungen} name="min_wert" />
- *     <Bound form={flow.forms.technische_anforderungen} name="max_wert" />
  *     <Bound form={flow.forms.technische_anforderungen} name="ist_pflichtanforderung" />
  *     <StepNav onNext={() => flow.validateStep(n)} />
  *     {!flow.submit.done && <SummaryStep forms={flow.formList} submit={flow.submit} />}
  *     {flow.submit.result && <SuccessStep result={flow.submit.result} forms={flow.formList} submit={flow.submit} />}
  *   </IntentWizardShell>
  */
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   useStepForm, useJourneySubmit, useRecordSearch,
   fieldText, fieldLookup, fieldLookups, fieldNumber, fieldDate, fieldRef,
@@ -105,10 +105,10 @@ export function useAnforderungenErfassenFlow(options: AnforderungenErfassenFlowO
   const steps = { ...DEFAULT_STEPS, ...(options.steps ?? {}) } as Record<string, number>;
   const [kundenanfragenTargetId, setKundenanfragenTargetId] = useState<string | null>(null);
   const technische_anforderungen = useStepForm('technische_anforderungen', {
-    fields: ["anfrage", "bezeichnung", "beschreibung", "anforderungstyp", "ursprung", "sollwert", "einheit", "vergleichsoperator", "min_wert", "max_wert", "ist_pflichtanforderung", "quellen"],
-    steps: only(steps, ["anfrage", "bezeichnung", "beschreibung", "anforderungstyp", "ursprung", "sollwert", "einheit", "vergleichsoperator", "min_wert", "max_wert", "ist_pflichtanforderung", "quellen"]) as Record<string, number>,
-    initial: only(options.initial as FormValues | undefined, ["anfrage", "bezeichnung", "beschreibung", "anforderungstyp", "ursprung", "sollwert", "einheit", "vergleichsoperator", "min_wert", "max_wert", "ist_pflichtanforderung", "quellen"]),
-    messages: only(options.messages as Record<string, string> | undefined, ["anfrage", "bezeichnung", "beschreibung", "anforderungstyp", "ursprung", "sollwert", "einheit", "vergleichsoperator", "min_wert", "max_wert", "ist_pflichtanforderung", "quellen"]),
+    fields: ["anfrage", "einheit", "quellen", "max_wert", "min_wert", "sollwert", "ursprung", "bezeichnung", "beschreibung", "anforderungstyp", "vergleichsoperator", "ist_pflichtanforderung"],
+    steps: only(steps, ["anfrage", "einheit", "quellen", "max_wert", "min_wert", "sollwert", "ursprung", "bezeichnung", "beschreibung", "anforderungstyp", "vergleichsoperator", "ist_pflichtanforderung"]) as Record<string, number>,
+    initial: only(options.initial as FormValues | undefined, ["anfrage", "einheit", "quellen", "max_wert", "min_wert", "sollwert", "ursprung", "bezeichnung", "beschreibung", "anforderungstyp", "vergleichsoperator", "ist_pflichtanforderung"]),
+    messages: only(options.messages as Record<string, string> | undefined, ["anfrage", "einheit", "quellen", "max_wert", "min_wert", "sollwert", "ursprung", "bezeichnung", "beschreibung", "anforderungstyp", "vergleichsoperator", "ist_pflichtanforderung"]),
   });
   const kundenanfragen = useStepForm('kundenanfragen', {
     fields: [],
@@ -205,6 +205,21 @@ export function useAnforderungenErfassenFlow(options: AnforderungenErfassenFlowO
       get record(): JourneyRecord | undefined { return kundenanfragenTargetId ? picks.kundenanfragen.recordOf(kundenanfragenTargetId) : undefined; },
     },
   };
+  // Opened for one record — `#/intents/anforderungen-erfassen?record=<id>`, the dashboard's
+  // flowActionFor(): that record is the one to change. Loaded, taken into the
+  // pick and selected — when this flow may change it at all (the pick's rule).
+  const [linkedId] = useState(() => new URLSearchParams(window.location.hash.split('?')[1] ?? '').get('record'));
+  useEffect(() => {
+    if (!linkedId) return;
+    let on = true;
+    void servicePort.get('kundenanfragen', linkedId).then(rec => {
+      if (!on || !rec || !((r: JourneyRecord) => ["neu", "in_pruefung", "rueckfragen_offen"].includes(fieldLookup(r, "status")?.key ?? ''))(rec)) return;
+      picks.kundenanfragen.adopt(rec);
+      targets.kundenanfragen.onSelect(rec.id);
+    }).catch(() => undefined);
+    return () => { on = false; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- once per link
+  }, [linkedId]);
   /** Props for a single-record pick step: {...flow.picks.x.select} {...flow.pick('x')} */
   const pick = (field: AnforderungenErfassenFieldKey) => {
     if (field in targets) {

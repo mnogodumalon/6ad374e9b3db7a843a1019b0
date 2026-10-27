@@ -1,7 +1,7 @@
 // AUTOMATICALLY GENERATED SERVICE
 import { APP_IDS, LOOKUP_OPTIONS, FIELD_TYPES } from '@/types/app';
 import { ensureUploadableImage } from '@/lib/ai';
-import { REST_URL } from '@/lib/origin';
+import { REST_URL, restFetch } from '@/lib/origin';
 import type { Kunden, Kundenanfragen, TechnischerAbschluss, Statusprotokoll, Informationsquellen, TechnischeAnforderungen, OffenePunkte, Aufgaben, Beurteilungen, RueckfragenUndKommunikation, Entscheidungen, Erfahrungen, WiederverwendungVonErfahrungen, CreateKunden, CreateKundenanfragen, CreateTechnischerAbschluss, CreateStatusprotokoll, CreateInformationsquellen, CreateTechnischeAnforderungen, CreateOffenePunkte, CreateAufgaben, CreateBeurteilungen, CreateRueckfragenUndKommunikation, CreateEntscheidungen, CreateErfahrungen, CreateWiederverwendungVonErfahrungen } from '@/types/app';
 
 // Base Configuration — the host is a RUNTIME fact (lib/origin.ts):
@@ -38,6 +38,9 @@ export function createRecordUrl(appId: string, recordId: string): string {
 export class LivingAppsApiError extends Error {
   status: number;
   type?: string;
+  /** Stable error type identifier — the last path segment of `type`
+   *  (v1: `…/rest/v1/docs/errors/<id>`, e.g. `no_app_permission`). */
+  code?: string;
   control_identifier?: string;
   control_type?: string;
   field_type?: string;
@@ -48,6 +51,7 @@ export class LivingAppsApiError extends Error {
     this.status = status;
     if (raw) {
       this.type = typeof raw.type === 'string' ? raw.type : undefined;
+      this.code = this.type ? this.type.replace(/\/+$/, '').split('/').pop() : undefined;
       this.control_identifier = typeof raw.control_identifier === 'string' ? raw.control_identifier : undefined;
       this.control_type = typeof raw.control_type === 'string' ? raw.control_type : undefined;
       this.field_type = typeof raw.field_type === 'string' ? raw.field_type : undefined;
@@ -127,7 +131,7 @@ async function callApi(method: string, endpoint: string, data?: any, options?: C
   const silent = options?.silent === true;
   let response: Response;
   try {
-    response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    response = await restFetch(`${API_BASE_URL}${endpoint}`, {
       method,
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',  // Nutze Session Cookies für Auth
@@ -181,7 +185,7 @@ export async function uploadFile(file: File | Blob, filename?: string): Promise<
   if (file instanceof File) file = await ensureUploadableImage(file);
   const formData = new FormData();
   formData.append('file', file, filename ?? (file instanceof File ? file.name : 'upload'));
-  const res = await fetch(`${API_BASE_URL}/files`, {
+  const res = await restFetch(`${API_BASE_URL}/files`, {
     method: 'POST',
     credentials: 'include',
     body: formData,

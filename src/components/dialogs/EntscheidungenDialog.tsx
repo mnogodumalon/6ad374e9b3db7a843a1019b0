@@ -459,7 +459,7 @@ export function EntscheidungenDialog({ open, onClose, onSubmit, defaultValues, r
         <Label htmlFor="betroffene_anforderungen">{fieldLabel('entscheidungen', 'betroffene_anforderungen')}</Label>
         <MultiCombobox
           id="betroffene_anforderungen"
-          placeholder="Welche Anforderungen?"
+          placeholder=""
           items={technischeAnforderungenListAll.map(r => ({
             id: r.record_id,
             label: String(r.fields.bezeichnung ?? r.record_id),
@@ -476,7 +476,7 @@ export function EntscheidungenDialog({ open, onClose, onSubmit, defaultValues, r
         <Label htmlFor="betroffene_offene_punkte">{fieldLabel('entscheidungen', 'betroffene_offene_punkte')}</Label>
         <MultiCombobox
           id="betroffene_offene_punkte"
-          placeholder="Welche offenen Punkte?"
+          placeholder=""
           items={offenePunkteListAll.map(r => ({
             id: r.record_id,
             label: String(r.fields.kurztitel ?? r.record_id),
@@ -493,7 +493,7 @@ export function EntscheidungenDialog({ open, onClose, onSubmit, defaultValues, r
         <Label htmlFor="zugrunde_liegende_beurteilungen">{fieldLabel('entscheidungen', 'zugrunde_liegende_beurteilungen')}</Label>
         <MultiCombobox
           id="zugrunde_liegende_beurteilungen"
-          placeholder="Welche Beurteilungen?"
+          placeholder=""
           items={beurteilungenListAll.map(r => ({
             id: r.record_id,
             label: String(r.fields.beurteilungsgegenstand ?? r.record_id),
@@ -510,7 +510,7 @@ export function EntscheidungenDialog({ open, onClose, onSubmit, defaultValues, r
         <Label htmlFor="ersetzt_durch_entscheidung">{fieldLabel('entscheidungen', 'ersetzt_durch_entscheidung')}</Label>
         <Combobox
           id="ersetzt_durch_entscheidung"
-          placeholder="Welche Entscheidung ersetzt sie?"
+          placeholder=""
           items={entscheidungenList.map(r => ({
             id: r.record_id,
             label: String(r.fields.titel ?? r.record_id),
@@ -525,7 +525,7 @@ export function EntscheidungenDialog({ open, onClose, onSubmit, defaultValues, r
         <Label htmlFor="anfrage">{fieldLabel('entscheidungen', 'anfrage')} <span className="text-destructive" aria-hidden="true">*</span></Label>
         <Combobox
           id="anfrage"
-          placeholder="Welche Anfrage?"
+          placeholder=""
           items={kundenanfragenListAll.map(r => ({
             id: r.record_id,
             label: String(r.fields.anfragenummer ?? r.record_id),
@@ -545,7 +545,7 @@ export function EntscheidungenDialog({ open, onClose, onSubmit, defaultValues, r
         <Label htmlFor="titel">{fieldLabel('entscheidungen', 'titel')} <span className="text-destructive" aria-hidden="true">*</span></Label>
         <Input
           id="titel"
-          placeholder="z. B. Freigabe Fertigungstoleranz"
+          placeholder=""
           value={fields.titel ?? ''}
           onChange={e => setFields(f => ({ ...f, titel: e.target.value }))}
           required
@@ -560,7 +560,7 @@ export function EntscheidungenDialog({ open, onClose, onSubmit, defaultValues, r
         <Label htmlFor="entscheidungsgegenstand">{fieldLabel('entscheidungen', 'entscheidungsgegenstand')} <span className="text-destructive" aria-hidden="true">*</span></Label>
         <Textarea
           id="entscheidungsgegenstand"
-          placeholder="Worüber wird entschieden?"
+          placeholder=""
           value={fields.entscheidungsgegenstand ?? ''}
           onChange={e => setFields(f => ({ ...f, entscheidungsgegenstand: e.target.value }))}
           rows={3}
@@ -577,7 +577,7 @@ export function EntscheidungenDialog({ open, onClose, onSubmit, defaultValues, r
           value={lookupKey(fields.entscheidungstyp) ?? ''}
           onValueChange={v => setFields(f => ({ ...f, entscheidungstyp: v === 'none' ? undefined : v as any }))}
         >
-          <SelectTrigger id="entscheidungstyp" className="max-sm:h-11"><SelectValue placeholder="z. B. Technische Freigabe, Ablehnung" /></SelectTrigger>
+          <SelectTrigger id="entscheidungstyp" className="max-sm:h-11"><SelectValue placeholder="" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="none">—</SelectItem>
             <SelectItem value="technische_freigabe">{lookupLabel('entscheidungen', 'entscheidungstyp', 'technische_freigabe') ?? 'Technische Freigabe'}</SelectItem>
@@ -598,7 +598,7 @@ export function EntscheidungenDialog({ open, onClose, onSubmit, defaultValues, r
         <Label htmlFor="alternativen">{fieldLabel('entscheidungen', 'alternativen')}</Label>
         <Textarea
           id="alternativen"
-          placeholder="Eine Alternative pro Zeile"
+          placeholder=""
           value={fields.alternativen ?? ''}
           onChange={e => setFields(f => ({ ...f, alternativen: e.target.value }))}
           rows={3}
@@ -610,7 +610,7 @@ export function EntscheidungenDialog({ open, onClose, onSubmit, defaultValues, r
         <Label htmlFor="entscheidung">{fieldLabel('entscheidungen', 'entscheidung')} <span className="text-destructive" aria-hidden="true">*</span></Label>
         <Textarea
           id="entscheidung"
-          placeholder="Was wurde entschieden?"
+          placeholder=""
           value={fields.entscheidung ?? ''}
           onChange={e => setFields(f => ({ ...f, entscheidung: e.target.value }))}
           rows={3}
@@ -625,7 +625,7 @@ export function EntscheidungenDialog({ open, onClose, onSubmit, defaultValues, r
         <Label htmlFor="begruendung">{fieldLabel('entscheidungen', 'begruendung')} <span className="text-destructive" aria-hidden="true">*</span></Label>
         <Textarea
           id="begruendung"
-          placeholder="Warum so entschieden?"
+          placeholder=""
           value={fields.begruendung ?? ''}
           onChange={e => setFields(f => ({ ...f, begruendung: e.target.value }))}
           rows={3}
@@ -640,7 +640,7 @@ export function EntscheidungenDialog({ open, onClose, onSubmit, defaultValues, r
         <Label htmlFor="verantwortlicher_vorname">{fieldLabel('entscheidungen', 'verantwortlicher_vorname')} <span className="text-destructive" aria-hidden="true">*</span></Label>
         <Input
           id="verantwortlicher_vorname"
-          placeholder="z. B. Anna"
+          placeholder=""
           value={fields.verantwortlicher_vorname ?? ''}
           onChange={e => setFields(f => ({ ...f, verantwortlicher_vorname: e.target.value }))}
           required
@@ -655,7 +655,7 @@ export function EntscheidungenDialog({ open, onClose, onSubmit, defaultValues, r
         <Label htmlFor="verantwortlicher_nachname">{fieldLabel('entscheidungen', 'verantwortlicher_nachname')} <span className="text-destructive" aria-hidden="true">*</span></Label>
         <Input
           id="verantwortlicher_nachname"
-          placeholder="z. B. Müller"
+          placeholder=""
           value={fields.verantwortlicher_nachname ?? ''}
           onChange={e => setFields(f => ({ ...f, verantwortlicher_nachname: e.target.value }))}
           required
@@ -758,7 +758,7 @@ export function EntscheidungenDialog({ open, onClose, onSubmit, defaultValues, r
         <Label htmlFor="entscheidungsdatum">{fieldLabel('entscheidungen', 'entscheidungsdatum')}</Label>
         <DatePicker
           id="entscheidungsdatum"
-          placeholder="Wann wurde entschieden?"
+          placeholder=""
           mode="datetime"
           value={fields.entscheidungsdatum ?? null}
           onChange={v => setFields(f => ({ ...f, entscheidungsdatum: v ?? undefined }))}
@@ -770,7 +770,7 @@ export function EntscheidungenDialog({ open, onClose, onSubmit, defaultValues, r
         <Label htmlFor="auflagen">{fieldLabel('entscheidungen', 'auflagen')}</Label>
         <Textarea
           id="auflagen"
-          placeholder="Eine Auflage pro Zeile"
+          placeholder=""
           value={fields.auflagen ?? ''}
           onChange={e => setFields(f => ({ ...f, auflagen: e.target.value }))}
           rows={3}
@@ -782,7 +782,7 @@ export function EntscheidungenDialog({ open, onClose, onSubmit, defaultValues, r
         <Label htmlFor="gueltig_bis">{fieldLabel('entscheidungen', 'gueltig_bis')}</Label>
         <DatePicker
           id="gueltig_bis"
-          placeholder="Bis wann gilt sie?"
+          placeholder=""
           mode="date"
           value={fields.gueltig_bis ?? null}
           onChange={v => setFields(f => ({ ...f, gueltig_bis: v ?? undefined }))}
@@ -794,7 +794,7 @@ export function EntscheidungenDialog({ open, onClose, onSubmit, defaultValues, r
         <Label htmlFor="ergebnis">{fieldLabel('entscheidungen', 'ergebnis')}</Label>
         <Textarea
           id="ergebnis"
-          placeholder="Was kam heraus?"
+          placeholder=""
           value={fields.ergebnis ?? ''}
           onChange={e => setFields(f => ({ ...f, ergebnis: e.target.value }))}
           rows={3}

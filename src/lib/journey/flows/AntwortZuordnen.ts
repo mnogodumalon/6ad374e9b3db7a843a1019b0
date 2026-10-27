@@ -1,7 +1,7 @@
 /**
  * useAntwortZuordnenFlow — the plumbing of the flow « Antwort zuordnen », generated from the plan.
  *
- * Writes `rueckfragen_und_kommunikation`: asks `anfrage`, `beantwortet_nachricht`, `zugehoerige_offene_punkte`, `quelle`, `kanal`, `absender`, `betreff`, `inhalt`, `antwortstatus`, `folgeaufgabe_noetig`; sets `kommunikationstyp`, `antwort_erhalten_am`, `versandstatus` itself.
+ * Writes `rueckfragen_und_kommunikation`: asks `kanal`, `inhalt`, `quelle`, `anfrage`, `betreff`, `absender`, `antwortstatus`, `folgeaufgabe_noetig`, `beantwortet_nachricht`, `zugehoerige_offene_punkte`; sets `versandstatus`, `kommunikationstyp`, `antwort_erhalten_am` itself.
 Changes `offene_punkte`: the record to change is picked (`flow.pick('offene_punkte')`), the form is prefilled with its values; ; sets `status`, `erneute_pruefung` itself.
  * The hook OWNS: the form(s) with exactly these fields and the plan's required
  * ingredients, one record search per picked field (columns and filter from
@@ -17,19 +17,19 @@ Changes `offene_punkte`: the record to change is picked (`flow.pick('offene_punk
  *   messages  the sentence for an empty required field, per field
  *
  *   const flow = useAntwortZuordnenFlow({
- *     steps: { offene_punkte: 1, anfrage: 2, beantwortet_nachricht: 3, zugehoerige_offene_punkte: 4, quelle: 5, kanal: 6, absender: 6, betreff: 6, inhalt: 6, antwortstatus: 6, folgeaufgabe_noetig: 6 },
- *     items: { anfrage: r => ({ id: r.id, title: fieldText(r, 'anfragenummer') }) },
+ *     steps: { offene_punkte: 1, quelle: 2, anfrage: 3, beantwortet_nachricht: 4, zugehoerige_offene_punkte: 5, kanal: 6, inhalt: 6, betreff: 6, absender: 6, antwortstatus: 6, folgeaufgabe_noetig: 6 },
+ *     items: { quelle: r => ({ id: r.id, title: fieldText(r, 'titel') }) },
  *   });
  *   <IntentWizardShell forms={flow.forms} draftKey={flow.draftKey} …>
+ *     <EntitySelectStep {...flow.picks.quelle.select} {...flow.pick('quelle')} />
  *     <EntitySelectStep {...flow.picks.anfrage.select} {...flow.pick('anfrage')} />
  *     <EntitySelectStep {...flow.picks.beantwortet_nachricht.select} {...flow.pick('beantwortet_nachricht')} />
  *     <EntitySelectStep {...flow.picks.zugehoerige_offene_punkte.select} {...flow.pickMany('zugehoerige_offene_punkte')} />
- *     <EntitySelectStep {...flow.picks.quelle.select} {...flow.pick('quelle')} />
  *     // the record this flow changes: <EntitySelectStep {...flow.picks.offene_punkte.select} {...flow.pick('offene_punkte')} />
  *     <Bound form={flow.forms.rueckfragen_und_kommunikation} name="kanal" />
- *     <Bound form={flow.forms.rueckfragen_und_kommunikation} name="absender" />
- *     <Bound form={flow.forms.rueckfragen_und_kommunikation} name="betreff" />
  *     <Bound form={flow.forms.rueckfragen_und_kommunikation} name="inhalt" />
+ *     <Bound form={flow.forms.rueckfragen_und_kommunikation} name="betreff" />
+ *     <Bound form={flow.forms.rueckfragen_und_kommunikation} name="absender" />
  *     <Bound form={flow.forms.rueckfragen_und_kommunikation} name="antwortstatus" />
  *     <Bound form={flow.forms.rueckfragen_und_kommunikation} name="folgeaufgabe_noetig" />
  *     <StepNav onNext={() => flow.validateStep(n)} />
@@ -37,7 +37,7 @@ Changes `offene_punkte`: the record to change is picked (`flow.pick('offene_punk
  *     {flow.submit.result && <SuccessStep result={flow.submit.result} forms={flow.formList} submit={flow.submit} />}
  *   </IntentWizardShell>
  */
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   useStepForm, useJourneySubmit, useRecordSearch,
   fieldText, fieldLookup, fieldLookups, fieldNumber, fieldDate, fieldRef,
@@ -64,15 +64,15 @@ export interface AntwortZuordnenFlowOptions {
   messages?: Partial<Record<Key, string>>;
   /** How a search hit reads — the card's title/subtitle/status per pick. */
   items?: {
+    quelle?: (record: JourneyRecord, ctx: RefContext) => SelectItemLike;
     anfrage?: (record: JourneyRecord, ctx: RefContext) => SelectItemLike;
     beantwortet_nachricht?: (record: JourneyRecord, ctx: RefContext) => SelectItemLike;
     zugehoerige_offene_punkte?: (record: JourneyRecord, ctx: RefContext) => SelectItemLike;
-    quelle?: (record: JourneyRecord, ctx: RefContext) => SelectItemLike;
     offene_punkte?: (record: JourneyRecord, ctx: RefContext) => SelectItemLike;
   };
 }
 
-const DEFAULT_STEPS: Record<string, number> = {"absender": 6, "anfrage": 2, "antwortstatus": 6, "beantwortet_nachricht": 3, "betreff": 6, "folgeaufgabe_noetig": 6, "inhalt": 6, "kanal": 6, "offene_punkte": 1, "quelle": 5, "zugehoerige_offene_punkte": 4};
+const DEFAULT_STEPS: Record<string, number> = {"absender": 6, "anfrage": 3, "antwortstatus": 6, "beantwortet_nachricht": 4, "betreff": 6, "folgeaufgabe_noetig": 6, "inhalt": 6, "kanal": 6, "offene_punkte": 1, "quelle": 2, "zugehoerige_offene_punkte": 5};
 export const ANTWORTZUORDNEN_REVIEW_STEP = 7;
 
 function fromPick<T>(pick: { recordOf(id: string): JourneyRecord | undefined }, form: StepForm, field: string, read: (r: JourneyRecord) => T): T | undefined {
@@ -105,10 +105,10 @@ export function useAntwortZuordnenFlow(options: AntwortZuordnenFlowOptions = {})
   const steps = { ...DEFAULT_STEPS, ...(options.steps ?? {}) } as Record<string, number>;
   const [offene_punkteTargetId, setOffenePunkteTargetId] = useState<string | null>(null);
   const rueckfragen_und_kommunikation = useStepForm('rueckfragen_und_kommunikation', {
-    fields: ["anfrage", "beantwortet_nachricht", "zugehoerige_offene_punkte", "quelle", "kanal", "absender", "betreff", "inhalt", "antwortstatus", "folgeaufgabe_noetig"],
-    steps: only(steps, ["anfrage", "beantwortet_nachricht", "zugehoerige_offene_punkte", "quelle", "kanal", "absender", "betreff", "inhalt", "antwortstatus", "folgeaufgabe_noetig"]) as Record<string, number>,
-    initial: only(options.initial as FormValues | undefined, ["anfrage", "beantwortet_nachricht", "zugehoerige_offene_punkte", "quelle", "kanal", "absender", "betreff", "inhalt", "antwortstatus", "folgeaufgabe_noetig"]),
-    messages: only(options.messages as Record<string, string> | undefined, ["anfrage", "beantwortet_nachricht", "zugehoerige_offene_punkte", "quelle", "kanal", "absender", "betreff", "inhalt", "antwortstatus", "folgeaufgabe_noetig"]),
+    fields: ["kanal", "inhalt", "quelle", "anfrage", "betreff", "absender", "antwortstatus", "folgeaufgabe_noetig", "beantwortet_nachricht", "zugehoerige_offene_punkte"],
+    steps: only(steps, ["kanal", "inhalt", "quelle", "anfrage", "betreff", "absender", "antwortstatus", "folgeaufgabe_noetig", "beantwortet_nachricht", "zugehoerige_offene_punkte"]) as Record<string, number>,
+    initial: only(options.initial as FormValues | undefined, ["kanal", "inhalt", "quelle", "anfrage", "betreff", "absender", "antwortstatus", "folgeaufgabe_noetig", "beantwortet_nachricht", "zugehoerige_offene_punkte"]),
+    messages: only(options.messages as Record<string, string> | undefined, ["kanal", "inhalt", "quelle", "anfrage", "betreff", "absender", "antwortstatus", "folgeaufgabe_noetig", "beantwortet_nachricht", "zugehoerige_offene_punkte"]),
   });
   const offene_punkte = useStepForm('offene_punkte', {
     fields: [],
@@ -124,6 +124,10 @@ export function useAntwortZuordnenFlow(options: AntwortZuordnenFlowOptions = {})
   // render time, so a change works on the running application.
   usePolicyVersion();
   const searches = {
+    quelle: useRecordSearch(servicePort, 'informationsquellen', withPickPolicy('quelle', {
+      searchFields: ["titel"] as never,
+      toItem: options.items?.quelle as never,
+    })),
     anfrage: useRecordSearch(servicePort, 'kundenanfragen', withPickPolicy('anfrage', {
       searchFields: ["anfragenummer"] as never,
       toItem: options.items?.anfrage as never,
@@ -137,10 +141,6 @@ export function useAntwortZuordnenFlow(options: AntwortZuordnenFlowOptions = {})
     zugehoerige_offene_punkte: useRecordSearch(servicePort, 'offene_punkte', withPickPolicy('zugehoerige_offene_punkte', {
       searchFields: ["kurztitel"] as never,
       toItem: options.items?.zugehoerige_offene_punkte as never,
-    })),
-    quelle: useRecordSearch(servicePort, 'informationsquellen', withPickPolicy('quelle', {
-      searchFields: ["titel"] as never,
-      toItem: options.items?.quelle as never,
     })),
     offene_punkte: useRecordSearch(servicePort, 'offene_punkte', withPickPolicy('offene_punkte', {
       searchFields: ["kurztitel"] as never,
@@ -162,10 +162,10 @@ export function useAntwortZuordnenFlow(options: AntwortZuordnenFlowOptions = {})
     href: `#/verwaltung/anwendung?line=intent:antwort-zuordnen:write:${entity}.${field}`,
   });
   const picks = {
+    quelle: { ...searches.quelle, select: { ...searches.quelle.select, create: false as boolean, hint: hintFor('quelle', 'informationsquellen', null as PickWhere | null) } },
     anfrage: { ...searches.anfrage, select: { ...searches.anfrage.select, create: false as boolean, hint: hintFor('anfrage', 'kundenanfragen', null as PickWhere | null) } },
     beantwortet_nachricht: { ...searches.beantwortet_nachricht, select: { ...searches.beantwortet_nachricht.select, create: false as boolean, hint: hintFor('beantwortet_nachricht', 'rueckfragen_und_kommunikation', {"conditions": [{"field": "versandstatus", "op": "eq", "value": "versendet"}, {"field": "antwortstatus", "op": "eq", "value": "offen"}], "mode": "all"} as PickWhere | null) } },
     zugehoerige_offene_punkte: { ...searches.zugehoerige_offene_punkte, select: { ...searches.zugehoerige_offene_punkte.select, create: false as boolean, hint: hintFor('zugehoerige_offene_punkte', 'offene_punkte', null as PickWhere | null) } },
-    quelle: { ...searches.quelle, select: { ...searches.quelle.select, create: false as boolean, hint: hintFor('quelle', 'informationsquellen', null as PickWhere | null) } },
     offene_punkte: { ...searches.offene_punkte, select: { ...searches.offene_punkte.select, create: false as boolean, hint: hintFor('offene_punkte', 'offene_punkte', null as PickWhere | null) } },
   };
 
@@ -173,13 +173,13 @@ export function useAntwortZuordnenFlow(options: AntwortZuordnenFlowOptions = {})
     {
       key: 'rueckfragen_und_kommunikation', entity: 'rueckfragen_und_kommunikation', form: rueckfragen_und_kommunikation, primary: true,
       values: (): FormValues => ({
+        versandstatus: policyFixedValue('rueckfragen_und_kommunikation', 'versandstatus') ?? "nicht_erforderlich",
         kommunikationstyp: policyFixedValue('rueckfragen_und_kommunikation', 'kommunikationstyp') ?? "antwort",
         antwort_erhalten_am: policyFixedValue('rueckfragen_und_kommunikation', 'antwort_erhalten_am') ?? nowIso(),
-        versandstatus: policyFixedValue('rueckfragen_und_kommunikation', 'versandstatus') ?? "nicht_erforderlich",
       }),
 
       // the review shows what this step sets itself — changeable on „Deine Anwendung“, not here
-      settings: () => [setting('rueckfragen_und_kommunikation', 'kommunikationstyp', policyFixedValue('rueckfragen_und_kommunikation', 'kommunikationstyp') ?? "antwort"), setting('rueckfragen_und_kommunikation', 'versandstatus', policyFixedValue('rueckfragen_und_kommunikation', 'versandstatus') ?? "nicht_erforderlich")],
+      settings: () => [setting('rueckfragen_und_kommunikation', 'versandstatus', policyFixedValue('rueckfragen_und_kommunikation', 'versandstatus') ?? "nicht_erforderlich"), setting('rueckfragen_und_kommunikation', 'kommunikationstyp', policyFixedValue('rueckfragen_und_kommunikation', 'kommunikationstyp') ?? "antwort")],
     },
     {
       key: 'offene_punkte', entity: 'offene_punkte', form: offene_punkte,
@@ -213,6 +213,21 @@ export function useAntwortZuordnenFlow(options: AntwortZuordnenFlowOptions = {})
       get record(): JourneyRecord | undefined { return offene_punkteTargetId ? picks.offene_punkte.recordOf(offene_punkteTargetId) : undefined; },
     },
   };
+  // Opened for one record — `#/intents/antwort-zuordnen?record=<id>`, the dashboard's
+  // flowActionFor(): that record is the one to change. Loaded, taken into the
+  // pick and selected — when this flow may change it at all (the pick's rule).
+  const [linkedId] = useState(() => new URLSearchParams(window.location.hash.split('?')[1] ?? '').get('record'));
+  useEffect(() => {
+    if (!linkedId) return;
+    let on = true;
+    void servicePort.get('offene_punkte', linkedId).then(rec => {
+      if (!on || !rec) return;
+      picks.offene_punkte.adopt(rec);
+      targets.offene_punkte.onSelect(rec.id);
+    }).catch(() => undefined);
+    return () => { on = false; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- once per link
+  }, [linkedId]);
   /** Props for a single-record pick step: {...flow.picks.x.select} {...flow.pick('x')} */
   const pick = (field: AntwortZuordnenFieldKey) => {
     if (field in targets) {
